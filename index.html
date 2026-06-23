@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RETRO TRADER JOURNAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#000;color:#fff;
+  font-family:'Press Start 2P',monospace;
+  font-size:9px;line-height:1.7;
+  padding:8px;overflow-x:hidden;
+}
+::-webkit-scrollbar{width:8px;background:#000}
+::-webkit-scrollbar-thumb{background:#0000ff}
+
+/* CRT overlay */
+.crt{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,.15)50%);
+  background-size:100% 3px;
+  pointer-events:none;z-index:9999;
+}
+
+/* Cards */
+.card{
+  border:3px outset #0000ff;background:#080808;
+  padding:12px;margin-bottom:14px;
+}
+.card-title{
+  background:linear-gradient(90deg,#000080,#0000ff);
+  color:#fff;padding:5px 10px;
+  margin:-12px -12px 12px;
+  font-size:9px;letter-spacing:1px;
+  text-shadow:1px 1px 0 #000;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* Alert Banner */
+.alert-banner{
+  border:3px outset #ff0000;background:#1a0000;
+  padding:12px;margin-bottom:14px;
+  text-align:center;
+}
+.alert-banner .alert-title{
+  color:#ff0000;font-size:10px;
+  animation:blink .7s infinite;
+  margin-bottom:6px;
+}
+.alert-banner .alert-sub{color:#ff8800;font-size:8px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:12px}
+.tab{
+  flex:1;padding:8px 4px;text-align:center;
+  border:3px outset #0000ff;background:#000060;
+  cursor:pointer;font-size:8px;font-family:inherit;
+  color:#aaaaff;
+}
+.tab.active{
+  background:#0000ff;color:#fff;
+  border-style:inset;
+}
+
+/* Inputs */
+label{display:block;color:#8888ff;font-size:8px;margin-bottom:3px}
+input,select{
+  width:100%;padding:8px;margin-bottom:10px;
+  background:#000;color:#00ff00;
+  border:2px inset #0000ff;
+  font-family:'Press Start 2P',monospace;font-size:8px;
+  outline:none;
+}
+input:focus,select:focus{color:#fff;border-color:#4488ff}
+
+/* Buttons */
+.btn{
+  width:100%;padding:10px;margin-top:4px;
+  border:3px outset #0000ff;background:#000080;
+  color:#fff;font-family:inherit;font-size:9px;
+  cursor:pointer;text-align:center;
+}
+.btn:active{border-style:inset;background:#000040}
+.btn-green{border-color:#00ff00;background:#004400;color:#00ff00}
+.btn-green:active{background:#002200}
+.btn-red{border-color:#ff0000;background:#440000;color:#ff4444}
+.btn-red:active{background:#220000}
+
+/* Status toggle */
+.status-row{display:flex;gap:6px;margin-bottom:10px}
+.status-btn{
+  flex:1;padding:8px 0;text-align:center;
+  border:2px outset #555;background:#111;
+  font-family:inherit;font-size:8px;cursor:pointer;color:#aaa;
+}
+.status-btn.tp{border-color:#00ff00;color:#00ff00}
+.status-btn.sl{border-color:#ff0000;color:#ff4444}
+.status-btn.be{border-color:#ffff00;color:#ffff00}
+.status-btn.active-tp{background:#003300;border-color:#00ff00;border-style:inset;color:#00ff00}
+.status-btn.active-sl{background:#330000;border-color:#ff0000;border-style:inset;color:#ff4444}
+.status-btn.active-be{background:#333300;border-color:#ffff00;border-style:inset;color:#ffff00}
+
+/* Psychology checkboxes */
+.psych-row{display:flex;gap:6px;margin-bottom:10px}
+.psych-btn{
+  flex:1;padding:6px 0;text-align:center;
+  border:2px outset #555;background:#111;
+  font-family:inherit;font-size:7px;cursor:pointer;color:#888;
+}
+.psych-btn.checked{background:#003366;border-color:#4488ff;border-style:inset;color:#88ccff}
+
+/* Trade log items */
+.trade-item{
+  border:2px outset #0000aa;background:#05050a;
+  padding:8px;margin-bottom:8px;
+}
+.trade-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:6px;
+}
+.trade-symbol{color:#88aaff;font-size:9px}
+.trade-date{color:#555;font-size:7px}
+.trade-row{display:flex;justify-content:space-between;margin-bottom:3px;font-size:7px}
+.trade-label{color:#666}
+.trade-value{color:#aaa}
+.pnl-pos{color:#00ff00}
+.pnl-neg{color:#ff4444}
+.pnl-be{color:#ffff00}
+.badge{
+  padding:2px 6px;font-size:7px;display:inline-block;
+  border:2px outset;
+}
+.badge-tp{border-color:#00ff00;color:#00ff00;background:#003300}
+.badge-sl{border-color:#ff4444;color:#ff4444;background:#330000}
+.badge-be{border-color:#ffff00;color:#ffff00;background:#333300}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.stat-box{
+  border:2px inset #0000aa;background:#050510;
+  padding:8px;text-align:center;
+}
+.stat-label{color:#555;font-size:7px;margin-bottom:4px}
+.stat-value{font-size:10px}
+
+/* Divider */
+.divider{border-top:2px inset #000080;margin:10px 0}
+
+/* Equity chart wrapper */
+.chart-wrap{width:100%;height:160px;margin:8px 0}
+
+/* CF items */
+.cf-item{
+  border:2px outset #004400;background:#020802;
+  padding:8px;margin-bottom:6px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cf-deposit{color:#00ff00}
+.cf-withdraw{color:#ff4444}
+
+/* Settings row */
+.setting-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid #111;
+}
+.toggle{
+  width:40px;height:20px;border:2px outset #0000ff;
+  background:#000040;cursor:pointer;position:relative;
+  display:flex;align-items:center;
+}
+.toggle-knob{
+  width:14px;height:14px;background:#4444ff;
+  position:absolute;transition:left .1s;
+}
+.toggle-knob.on{left:22px;background:#00ff00}
+.toggle-knob.off{left:2px;background:#444}
+
+/* Empty state */
+.empty{color:#333;text-align:center;padding:20px;font-size:8px}
+
+/* Bottom nav */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#000;border-top:3px outset #0000ff;
+  display:flex;z-index:100;
+}
+.nav-btn{
+  flex:1;padding:12px 4px 8px;text-align:center;
+  border:none;background:transparent;
+  font-family:inherit;font-size:7px;color:#556;
+  cursor:pointer;
+}
+.nav-btn.active{color:#88aaff;border-top:2px solid #0000ff}
+.nav-icon{font-size:14px;display:block;margin-bottom:3px}
+.page-wrap{padding-bottom:64px}
+
+/* Delete button small */
+.del-btn{
+  background:#220000;border:1px outset #ff0000;
+  color:#ff4444;padding:3px 6px;font-family:inherit;
+  font-size:7px;cursor:pointer;
+}
+.del-btn:active{border-style:inset}
+</style>
+</head>
+<body>
+<div class="crt"></div>
+<div id="app"></div>
+
+<script>
+// ─── STORAGE ───────────────────────────────────────────────────────────────
+const KEY = {
+  TRADES:   'rtj_trades_v2',
+  CFS:      'rtj_cfs_v2',
+  BALANCE:  'rtj_balance_v2',
+  SOUND:    'rtj_sound_v2',
+  ALERT:    'rtj_alert_date_v2',  // stores YYYY-MM-DD of last alert day
+};
+
+function load(key, def) {
+  try {
+    const v = localStorage.getItem(key);
+    return v !== null ? JSON.parse(v) : def;
+  } catch { return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+// ─── AUDIO ─────────────────────────────────────────────────────────────────
+function beep(type) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    if (type === 'win') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime+.09);
+      g.gain.setValueAtTime(.07, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.3);
+      osc.start(); osc.stop(ctx.currentTime+.3);
+    } else if (type === 'lose') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime+.5);
+      g.gain.setValueAtTime(.08, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.5);
+      osc.start(); osc.stop(ctx.currentTime+.5);
+    } else if (type === 'alert') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(800, ctx.currentTime+.2);
+      osc.frequency.linearRampToValueAtTime(400, ctx.currentTime+.4);
+      g.gain.setValueAtTime(.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.4);
+      osc.start(); osc.stop(ctx.currentTime+.4);
+    } else {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      g.gain.setValueAtTime(.04, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.06);
+      osc.start(); osc.stop(ctx.currentTime+.06);
+    }
+  } catch {}
+}
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmt(n, d=2) { return Number(n).toFixed(d); }
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  const [y,m,d] = dateStr.split('-');
+  return `${d}/${m}/${y.slice(2)}`;
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+const state = {
+  page:      'HOME',      // HOME | LOG | STATS | SETTINGS
+  inputTab:  'TRADE',     // TRADE | CASHFLOW
+  logTab:    'TRADE',
+  sound:     load(KEY.SOUND, true),
+  balance:   load(KEY.BALANCE, 10000),
+  trades:    load(KEY.TRADES, []),
+  cfs:       load(KEY.CFS, []),
+  alertDate: load(KEY.ALERT, null),  // YYYY-MM-DD when alert was last shown
+  // trade form
+  f: {
+    date: today(), symbol:'GOLD', dir:'Buy', entry:'', exit:'',
+    sl:'', lot:'', pnl:'', status:'TP', tf:'1H',
+    disc:false, greed:false, fear:false,
+  },
+  // cashflow form
+  cf: { date: today(), type:'Deposit', amount:'', desc:'' },
+  // log filter
+  filter: { symbol:'ALL', status:'ALL' },
+  editBal: false,
+  tempBal: '',
+};
+
+// ─── ALERT LOGIC ───────────────────────────────────────────────────────────
+// Alert when today's SL count >= 2. Reset on new day.
+function getTodayLosses() {
+  const t = today();
+  return state.trades.filter(tr => tr.date === t && tr.status === 'SL').length;
+}
+function shouldShowAlert() {
+  const losses = getTodayLosses();
+  if (losses < 2) return false;
+  // If already alerted today, still show banner (stays all day)
+  return true;
+}
+function isAlertDismissed() {
+  // Never fully dismissed — shows all day once triggered, clears next day automatically
+  return false; // we always show if shouldShowAlert()
+}
+
+// ─── RENDER ────────────────────────────────────────────────────────────────
+function render() {
+  document.getElementById('app').innerHTML = buildApp();
+  attachEvents();
+}
+
+function buildApp() {
+  return `
+    ${buildAlert()}
+    <div class="page-wrap">
+      ${state.page === 'HOME'     ? buildHome()     : ''}
+      ${state.page === 'LOG'      ? buildLog()      : ''}
+      ${state.page === 'STATS'    ? buildStats()    : ''}
+      ${state.page === 'SETTINGS' ? buildSettings() : ''}
+    </div>
+    ${buildNav()}
+  `;
+}
+
+// ─── ALERT BANNER ──────────────────────────────────────────────────────────
+function buildAlert() {
+  if (!shouldShowAlert()) return '';
+  const losses = getTodayLosses();
+  return `
+    <div class="alert-banner">
+      <div class="alert-title">⚠ STOP TRADING TODAY ⚠</div>
+      <div class="alert-sub">แพ้ ${losses} ไม้แล้ววันนี้ — หยุดพักก่อน!</div>
+    </div>
+  `;
+}
+
+// ─── BOTTOM NAV ────────────────────────────────────────────────────────────
+function buildNav() {
+  const pages = [
+    { id:'HOME',     icon:'📝', label:'INPUT' },
+    { id:'LOG',      icon:'📋', label:'LOG' },
+    { id:'STATS',    icon:'📊', label:'STATS' },
+    { id:'SETTINGS', icon:'⚙', label:'SET' },
+  ];
+  return `<div class="bottom-nav">
+    ${pages.map(p=>`
+      <button class="nav-btn ${state.page===p.id?'active':''}" data-nav="${p.id}">
+        <span class="nav-icon">${p.icon}</span>${p.label}
+      </button>
+    `).join('')}
+  </div>`;
+}
+
+// ─── HOME (INPUT) ───────────────────────────────────────────────────────────
+function buildHome() {
+  return `
+    <div class="card">
+      <div class="card-title">
+        <span>▶ RETRO TRADER</span>
+        <span style="font-size:7px;color:#88aaff">${today()}</span>
+      </div>
+      <div class="tabs">
+        <button class="tab ${state.inputTab==='TRADE'?'active':''}" data-tab-input="TRADE">TRADE</button>
+        <button class="tab ${state.inputTab==='CASHFLOW'?'active':''}" data-tab-input="CASHFLOW">CASHFLOW</button>
+      </div>
+      ${state.inputTab === 'TRADE' ? buildTradeForm() : buildCFForm()}
+    </div>
+  `;
+}
+
+function buildTradeForm() {
+  const f = state.f;
+  const symbols = ['GOLD','XAUUSD','BTCUSD','US30','NAS100','EURUSD','GBPUSD','Other'];
+  const tfs     = ['1M','5M','15M','30M','1H','4H','D1','W1'];
+  return `
+    <label>วันที่</label>
+    <input type="date" id="f-date" value="${f.date}">
+
+    <label>คู่เงิน / สินทรัพย์</label>
+    <select id="f-symbol">
+      ${symbols.map(s=>`<option ${f.symbol===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+
+    <label>ทิศทาง</label>
+    <div class="status-row" style="margin-bottom:10px">
+      <button class="status-btn ${f.dir==='Buy'?'active-tp':'tp'}" data-dir="Buy">▲ BUY</button>
+      <button class="status-btn ${f.dir==='Sell'?'active-sl':'sl'}" data-dir="Sell">▼ SELL</button>
+    </div>
+
+    <label>Timeframe</label>
+    <select id="f-tf">
+      ${tfs.map(t=>`<option ${f.tf===t?'selected':''}>${t}</option>`).join('')}
+    </select>
+
+    <label>Entry Price</label>
+    <input type="number" id="f-entry" placeholder="0.00" value="${f.entry}" inputmode="decimal">
+
+    <label>Exit Price</label>
+    <input type="number" id="f-exit" placeholder="0.00" value="${f.exit}" inputmode="decimal">
+
+    <label>Stop Loss Price</label>
+    <input type="number" id="f-sl" placeholder="0.00" value="${f.sl}" inputmode="decimal">
+
+    <label>Lot Size</label>
+    <input type="number" id="f-lot" placeholder="0.01" value="${f.lot}" inputmode="decimal">
+
+    <label>P&amp;L (USD)</label>
+    <input type="number" id="f-pnl" placeholder="+/- ใส่เอง" value="${f.pnl}" inputmode="decimal">
+
+    <label>ผลลัพธ์</label>
+    <div class="status-row">
+      <button class="status-btn tp ${f.status==='TP'?'active-tp':''}" data-status="TP">✓ TP</button>
+      <button class="status-btn sl ${f.status==='SL'?'active-sl':''}" data-status="SL">✗ SL</button>
+      <button class="status-btn be ${f.status==='BE'?'active-be':''}" data-status="BE">= BE</button>
+    </div>
+
+    <label>จิตวิทยา</label>
+    <div class="psych-row">
+      <button class="psych-btn ${f.disc?'checked':''}" data-psych="disc">🧘 DISC</button>
+      <button class="psych-btn ${f.greed?'checked':''}" data-psych="greed">🤑 GREED</button>
+      <button class="psych-btn ${f.fear?'checked':''}" data-psych="fear">😨 FEAR</button>
+    </div>
+
+    <button class="btn btn-green" id="btn-add-trade">► ADD TRADE</button>
+  `;
+}
+
+function buildCFForm() {
+  const cf = state.cf;
+  return `
+    <label>วันที่</label>
+    <input type="date" id="cf-date" value="${cf.date}">
+
+    <label>ประเภท</label>
+    <div class="status-row" style="margin-bottom:10px">
+      <button class="status-btn tp ${cf.type==='Deposit'?'active-tp':''}" data-cftype="Deposit">▲ ฝาก</button>
+      <button class="status-btn sl ${cf.type==='Withdraw'?'active-sl':''}" data-cftype="Withdraw">▼ ถอน</button>
+    </div>
+
+    <label>จำนวนเงิน (USD)</label>
+    <input type="number" id="cf-amount" placeholder="0.00" value="${cf.amount}" inputmode="decimal">
+
+    <label>หมายเหตุ</label>
+    <input type="text" id="cf-desc" placeholder="เพิ่มทุน..." value="${cf.desc}">
+
+    <button class="btn btn-green" id="btn-add-cf">► ADD CASHFLOW</button>
+  `;
+}
+
+// ─── LOG ────────────────────────────────────────────────────────────────────
+function buildLog() {
+  const symbols = ['ALL',...new Set(state.trades.map(t=>t.symbol))];
+  return `
+    <div class="card">
+      <div class="card-title"><span>📋 TRADE LOG</span></div>
+      <div class="tabs">
+        <button class="tab ${state.logTab==='TRADE'?'active':''}" data-tab-log="TRADE">TRADE</button>
+        <button class="tab ${state.logTab==='CF'?'active':''}" data-tab-log="CF">CASHFLOW</button>
+      </div>
+      ${state.logTab==='TRADE' ? buildTradeLog(symbols) : buildCFLog()}
+    </div>
+  `;
+}
+
+function buildTradeLog(symbols) {
+  let filtered = [...state.trades].sort((a,b)=>b.date.localeCompare(a.date));
+  if (state.filter.symbol !== 'ALL') filtered = filtered.filter(t=>t.symbol===state.filter.symbol);
+  if (state.filter.status !== 'ALL') filtered = filtered.filter(t=>t.status===state.filter.status);
+
+  return `
+    <div style="display:flex;gap:4px;margin-bottom:10px">
+      <select id="flt-symbol" style="margin-bottom:0;font-size:7px">
+        ${symbols.map(s=>`<option ${state.filter.symbol===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <select id="flt-status" style="margin-bottom:0;font-size:7px">
+        ${['ALL','TP','SL','BE'].map(s=>`<option ${state.filter.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    ${filtered.length===0
+      ? `<div class="empty">ไม่พบข้อมูล</div>`
+      : filtered.map(t => buildTradeItem(t)).join('')
+    }
+  `;
+}
+
+function buildTradeItem(t) {
+  const pnlClass = t.pnl > 0 ? 'pnl-pos' : t.pnl < 0 ? 'pnl-neg' : 'pnl-be';
+  const pnlSign  = t.pnl > 0 ? '+' : '';
+  const badgeCls = t.status==='TP'?'badge-tp':t.status==='SL'?'badge-sl':'badge-be';
+  const psychTags = [
+    t.psychology?.disc  && '🧘',
+    t.psychology?.greed && '🤑',
+    t.psychology?.fear  && '😨',
+  ].filter(Boolean).join(' ');
+  return `
+    <div class="trade-item">
+      <div class="trade-header">
+        <span class="trade-symbol">${t.symbol} <span class="${t.dir==='Buy'?'pnl-pos':'pnl-neg'}">${t.dir==='Buy'?'▲':'▼'}</span></span>
+        <span class="badge ${badgeCls}">${t.status}</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-label">DATE</span>
+        <span class="trade-value">${fmtDate(t.date)}</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-label">ENTRY / EXIT</span>
+        <span class="trade-value">${fmt(t.entry,2)} → ${fmt(t.exit,2)}</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-label">SL / LOT</span>
+        <span class="trade-value">${fmt(t.sl,2)} / ${t.lot}</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-label">TF</span>
+        <span class="trade-value">${t.tf}</span>
+      </div>
+      <div class="trade-row">
+        <span class="trade-label">P&L</span>
+        <span class="${pnlClass}">${pnlSign}$${fmt(t.pnl,2)}</span>
+      </div>
+      ${psychTags ? `<div style="margin-top:4px;font-size:10px">${psychTags}</div>` : ''}
+      <div style="margin-top:6px;text-align:right">
+        <button class="del-btn" data-del-trade="${t.id}">✕ DEL</button>
+      </div>
+    </div>
+  `;
+}
+
+function buildCFLog() {
+  const sorted = [...state.cfs].sort((a,b)=>b.date.localeCompare(a.date));
+  if (sorted.length===0) return `<div class="empty">ไม่มีรายการ</div>`;
+  return sorted.map(cf=>`
+    <div class="cf-item">
+      <div>
+        <div style="color:#888;font-size:7px;margin-bottom:3px">${fmtDate(cf.date)}</div>
+        <div style="font-size:8px;color:#aaa">${cf.desc||cf.type}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="${cf.type==='Deposit'?'cf-deposit':'cf-withdraw'}" style="font-size:9px">
+          ${cf.type==='Deposit'?'+':'-'}$${fmt(cf.amount,0)}
+        </span>
+        <button class="del-btn" data-del-cf="${cf.id}">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── STATS ──────────────────────────────────────────────────────────────────
+function buildStats() {
+  const trades = state.trades;
+  const totalPnl = trades.reduce((s,t)=>s+t.pnl, 0);
+  const wins  = trades.filter(t=>t.status==='TP').length;
+  const loses = trades.filter(t=>t.status==='SL').length;
+  const
