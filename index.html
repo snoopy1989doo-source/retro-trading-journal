@@ -570,4 +570,350 @@ function buildStats() {
   const totalPnl = trades.reduce((s,t)=>s+t.pnl, 0);
   const wins  = trades.filter(t=>t.status==='TP').length;
   const loses = trades.filter(t=>t.status==='SL').length;
-  const
+  const bes   = trades.filter(t=>t.status==='BE').length;
+  const total = trades.length;
+  const wr    = total > 0 ? (wins/total*100).toFixed(0) : 0;
+  const netDeposit = state.cfs.reduce((s,cf)=>s+(cf.type==='Deposit'?cf.amount:-cf.amount),0);
+  const equity = state.balance + netDeposit + totalPnl;
+
+  // Build equity curve (cumulative PnL sorted by date)
+  const sorted = [...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  let cum = 0;
+  const curve = sorted.map(t=>{ cum+=t.pnl; return cum; });
+
+  // Today's stats
+  const t = today();
+  const todayTrades = trades.filter(tr=>tr.date===t);
+  const todayPnl = todayTrades.reduce((s,tr)=>s+tr.pnl,0);
+  const todaySL  = todayTrades.filter(tr=>tr.status==='SL').length;
+
+  return `
+    <div class="card">
+      <div class="card-title"><span>📊 STATISTICS</span></div>
+
+      <div style="color:#555;font-size:7px;margin-bottom:6px">วันนี้</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">P&L วันนี้</div>
+          <div class="stat-value ${todayPnl>=0?'pnl-pos':'pnl-neg'}">${todayPnl>=0?'+':''}$${fmt(todayPnl,2)}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">SL วันนี้</div>
+          <div class="stat-value ${todaySL>=2?'pnl-neg':'pnl-be'}">${todaySL} ไม้</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="color:#555;font-size:7px;margin-bottom:6px">ภาพรวม</div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">EQUITY</div>
+          <div class="stat-value ${equity>=state.balance?'pnl-pos':'pnl-neg'}">$${fmt(equity,0)}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">NET P&L</div>
+          <div class="stat-value ${totalPnl>=0?'pnl-pos':'pnl-neg'}">${totalPnl>=0?'+':''}$${fmt(totalPnl,2)}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">WIN RATE</div>
+          <div class="stat-value pnl-pos">${wr}%</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">TRADES</div>
+          <div class="stat-value" style="color:#88aaff">${total}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">WIN / BE / SL</div>
+          <div class="stat-value" style="font-size:9px">
+            <span class="pnl-pos">${wins}</span> /
+            <span class="pnl-be">${bes}</span> /
+            <span class="pnl-neg">${loses}</span>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">START BAL</div>
+          <div class="stat-value" style="color:#aaa;font-size:9px">$${fmt(state.balance,0)}</div>
+        </div>
+      </div>
+
+      ${curve.length > 1 ? buildCurve(curve) : `<div class="empty" style="margin-top:12px">เพิ่ม trade เพื่อดู equity curve</div>`}
+    </div>
+  `;
+}
+
+function buildCurve(curve) {
+  const maxV = Math.max(...curve, 0);
+  const minV = Math.min(...curve, 0);
+  const range = maxV - minV || 1;
+  const W = 300, H = 120, PAD = 4;
+
+  const pts = curve.map((v,i)=>{
+    const x = PAD + (i/(curve.length-1||1))*(W-PAD*2);
+    const y = H - PAD - ((v-minV)/range)*(H-PAD*2);
+    return `${x},${y}`;
+  }).join(' ');
+
+  const zeroY = H - PAD - ((0-minV)/range)*(H-PAD*2);
+
+  return `
+    <div style="margin-top:12px;color:#555;font-size:7px;margin-bottom:4px">EQUITY CURVE</div>
+    <div style="overflow-x:auto">
+      <svg width="${W}" height="${H}" style="display:block;background:#050510;border:2px inset #0000aa">
+        <line x1="${PAD}" y1="${zeroY}" x2="${W-PAD}" y2="${zeroY}" stroke="#222" stroke-width="1" stroke-dasharray="4,3"/>
+        <polyline points="${pts}" fill="none" stroke="#4488ff" stroke-width="2"/>
+        <circle cx="${parseFloat(pts.split(' ').at(-1).split(',')[0])}" cy="${parseFloat(pts.split(' ').at(-1).split(',')[1])}" r="3" fill="${curve.at(-1)>=0?'#00ff00':'#ff4444'}"/>
+      </svg>
+    </div>
+  `;
+}
+
+// ─── SETTINGS ───────────────────────────────────────────────────────────────
+function buildSettings() {
+  return `
+    <div class="card">
+      <div class="card-title"><span>⚙ SETTINGS</span></div>
+
+      <div class="setting-row">
+        <span>เสียง 8-bit</span>
+        <div class="toggle" id="toggle-sound">
+          <div class="toggle-knob ${state.sound?'on':'off'}"></div>
+        </div>
+      </div>
+
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <span style="color:#888;font-size:8px">Starting Balance ($)</span>
+        ${state.editBal
+          ? `<div style="display:flex;gap:6px;width:100%">
+               <input type="number" id="bal-input" value="${state.tempBal}" inputmode="decimal" style="margin-bottom:0;flex:1">
+               <button class="btn" id="btn-save-bal" style="width:auto;padding:8px 10px;margin-top:0">OK</button>
+             </div>`
+          : `<div style="display:flex;gap:8px;align-items:center">
+               <span style="color:#88aaff;font-size:11px">$${fmt(state.balance,0)}</span>
+               <button class="btn" id="btn-edit-bal" style="width:auto;padding:6px 10px;margin-top:0;font-size:7px">EDIT</button>
+             </div>`
+        }
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="color:#555;font-size:7px;margin-bottom:8px">⚠ DANGER ZONE</div>
+      <button class="btn btn-red" id="btn-clear-trades">✕ ลบ Trade ทั้งหมด</button>
+    </div>
+    <div style="text-align:center;color:#333;font-size:7px;padding:12px">
+      RETRO TRADER JOURNAL v2.0<br>
+      <span style="color:#222">made with ♥ for mobile</span>
+    </div>
+  `;
+}
+
+// ─── EVENT ATTACHMENT ───────────────────────────────────────────────────────
+function attachEvents() {
+  // Nav
+  document.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      state.page = el.dataset.nav;
+      if (state.sound) beep('click');
+      render();
+    });
+  });
+
+  // Input tabs
+  document.querySelectorAll('[data-tab-input]').forEach(el=>{
+    el.addEventListener('click',()=>{ state.inputTab=el.dataset.tabInput; render(); });
+  });
+
+  // Log tabs
+  document.querySelectorAll('[data-tab-log]').forEach(el=>{
+    el.addEventListener('click',()=>{ state.logTab=el.dataset.tabLog; render(); });
+  });
+
+  // Trade form: live capture
+  const liveFields = {
+    'f-date': v=>state.f.date=v,
+    'f-symbol': v=>state.f.symbol=v,
+    'f-tf': v=>state.f.tf=v,
+    'f-entry': v=>state.f.entry=v,
+    'f-exit': v=>state.f.exit=v,
+    'f-sl': v=>state.f.sl=v,
+    'f-lot': v=>state.f.lot=v,
+    'f-pnl': v=>state.f.pnl=v,
+  };
+  Object.entries(liveFields).forEach(([id,fn])=>{
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input',e=>fn(e.target.value));
+  });
+
+  // Direction buttons
+  document.querySelectorAll('[data-dir]').forEach(el=>{
+    el.addEventListener('click',()=>{ state.f.dir=el.dataset.dir; render(); });
+  });
+
+  // Status buttons
+  document.querySelectorAll('[data-status]').forEach(el=>{
+    el.addEventListener('click',()=>{ state.f.status=el.dataset.status; render(); });
+  });
+
+  // Psychology
+  document.querySelectorAll('[data-psych]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const k = el.dataset.psych;
+      state.f[k] = !state.f[k];
+      el.classList.toggle('checked');
+      if (state.sound) beep('click');
+    });
+  });
+
+  // CF type
+  document.querySelectorAll('[data-cftype]').forEach(el=>{
+    el.addEventListener('click',()=>{ state.cf.type=el.dataset.cftype; render(); });
+  });
+
+  // CF form live
+  ['cf-date','cf-amount','cf-desc'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input',e=>{
+      if (id==='cf-date')   state.cf.date   = e.target.value;
+      if (id==='cf-amount') state.cf.amount = e.target.value;
+      if (id==='cf-desc')   state.cf.desc   = e.target.value;
+    });
+  });
+
+  // Add trade
+  const btnTrade = document.getElementById('btn-add-trade');
+  if (btnTrade) btnTrade.addEventListener('click',()=>{
+    const f = state.f;
+    if (!f.entry || !f.exit || !f.sl || !f.lot || f.pnl==='') {
+      alert('กรอกข้อมูลให้ครบก่อนนะ!'); return;
+    }
+    const trade = {
+      id: uid(),
+      date: f.date,
+      symbol: f.symbol,
+      dir: f.dir,
+      entry: parseFloat(f.entry)||0,
+      exit: parseFloat(f.exit)||0,
+      sl: parseFloat(f.sl)||0,
+      lot: parseFloat(f.lot)||0,
+      pnl: parseFloat(f.pnl)||0,
+      status: f.status,
+      tf: f.tf,
+      psychology: { disc: f.disc, greed: f.greed, fear: f.fear },
+    };
+    state.trades.push(trade);
+    save(KEY.TRADES, state.trades);
+
+    // Sound
+    if (state.sound) {
+      if (f.status==='TP') beep('win');
+      else if (f.status==='SL') beep('lose');
+      else beep('click');
+    }
+
+    // Check if we need to alert (SL today >= 2)
+    if (f.status==='SL') {
+      const todaySL = state.trades.filter(t=>t.date===today()&&t.status==='SL').length;
+      if (todaySL >= 2 && state.sound) {
+        setTimeout(()=>beep('alert'), 400);
+      }
+    }
+
+    // Reset form (keep date, symbol, tf)
+    state.f = { ...state.f, entry:'', exit:'', sl:'', lot:'', pnl:'',
+                 status:'TP', disc:false, greed:false, fear:false };
+    render();
+  });
+
+  // Add cashflow
+  const btnCF = document.getElementById('btn-add-cf');
+  if (btnCF) btnCF.addEventListener('click',()=>{
+    const cf = state.cf;
+    if (!cf.amount || parseFloat(cf.amount)<=0) {
+      alert('ใส่จำนวนเงินด้วย!'); return;
+    }
+    state.cfs.push({
+      id: uid(),
+      date: cf.date,
+      type: cf.type,
+      amount: parseFloat(cf.amount),
+      desc: cf.desc,
+    });
+    save(KEY.CFS, state.cfs);
+    if (state.sound) beep('win');
+    state.cf = { date: today(), type:'Deposit', amount:'', desc:'' };
+    render();
+  });
+
+  // Delete trade
+  document.querySelectorAll('[data-del-trade]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      if (!confirm('ลบ trade นี้?')) return;
+      state.trades = state.trades.filter(t=>t.id!==el.dataset.delTrade);
+      save(KEY.TRADES, state.trades);
+      render();
+    });
+  });
+
+  // Delete CF
+  document.querySelectorAll('[data-del-cf]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      if (!confirm('ลบรายการนี้?')) return;
+      state.cfs = state.cfs.filter(c=>c.id!==el.dataset.delCf);
+      save(KEY.CFS, state.cfs);
+      render();
+    });
+  });
+
+  // Filters
+  const fltSym = document.getElementById('flt-symbol');
+  if (fltSym) fltSym.addEventListener('change',e=>{ state.filter.symbol=e.target.value; render(); });
+  const fltSt  = document.getElementById('flt-status');
+  if (fltSt) fltSt.addEventListener('change',e=>{ state.filter.status=e.target.value; render(); });
+
+  // Sound toggle
+  const tog = document.getElementById('toggle-sound');
+  if (tog) tog.addEventListener('click',()=>{
+    state.sound = !state.sound;
+    save(KEY.SOUND, state.sound);
+    render();
+  });
+
+  // Balance edit
+  const btnEditBal = document.getElementById('btn-edit-bal');
+  if (btnEditBal) btnEditBal.addEventListener('click',()=>{
+    state.editBal = true;
+    state.tempBal = state.balance;
+    render();
+    document.getElementById('bal-input')?.focus();
+  });
+
+  const balInput = document.getElementById('bal-input');
+  if (balInput) balInput.addEventListener('input',e=>state.tempBal=e.target.value);
+
+  const btnSaveBal = document.getElementById('btn-save-bal');
+  if (btnSaveBal) btnSaveBal.addEventListener('click',()=>{
+    const v = parseFloat(state.tempBal);
+    if (!isNaN(v) && v >= 0) {
+      state.balance = v;
+      save(KEY.BALANCE, v);
+    }
+    state.editBal = false;
+    render();
+  });
+
+  // Clear all trades
+  const btnClear = document.getElementById('btn-clear-trades');
+  if (btnClear) btnClear.addEventListener('click',()=>{
+    if (!confirm('ลบ trade ทั้งหมด? ยืนยัน?')) return;
+    state.trades = [];
+    save(KEY.TRADES, []);
+    render();
+  });
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
