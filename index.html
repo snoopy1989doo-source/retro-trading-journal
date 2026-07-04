@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>RETRO TRADER JOURNAL - V.3.1 CLOUD CONNECT</title>
+<title>RETRO TRADER JOURNAL - V.3.3 FULL INTEGRITY</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <!-- ฝัง Firebase Compatibility SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -185,7 +185,7 @@ input:focus,select:focus{color:#fff;border-color:#4488ff}
 <div id="app"></div>
 
 <script>
-// 📡 SYNC CONFIG: เชื่อมต่อโปรเจกต์และถังข้อมูลเดียวกับคลาวด์ Pixel Steward
+// 📡 SYNC CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyD-FLJd2vKaFX-2F8kzE87inrmGEH5pyzY",
   authDomain: "pixel-steward-db.firebaseapp.com",
@@ -200,9 +200,7 @@ let isCloudActive = false;
 try {
   firebase.initializeApp(firebaseConfig);
   isCloudActive = true;
-} catch (e) {
-  console.error("Cloud Connection Failed:", e);
-}
+} catch (e) { console.error("Cloud Connection Failed:", e); }
 
 const KEY = {
   TRADES:  'rtj_trades_v2',
@@ -215,34 +213,26 @@ function load(key, def) {
   try { const v=localStorage.getItem(key); return v!==null?JSON.parse(v):def; }
   catch { return def; }
 }
-function save(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
-}
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
 function beep(type) {
   try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    const ctx=new AC(), osc=ctx.createOscillator(), g=ctx.createGain();
-    osc.connect(g); g.connect(ctx.destination);
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ctx=new AC(), osc=ctx.createOscillator(), g=ctx.createGain(); osc.connect(g); g.connect(ctx.destination);
     if (type==='win') {
-      osc.type='square'; osc.frequency.setValueAtTime(523,ctx.currentTime);
-      osc.frequency.setValueAtTime(659,ctx.currentTime+.09);
+      osc.type='square'; osc.frequency.setValueAtTime(523,ctx.currentTime); osc.frequency.setValueAtTime(659,ctx.currentTime+.09);
       g.gain.setValueAtTime(.07,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);
       osc.start(); osc.stop(ctx.currentTime+.3);
     } else if (type==='lose') {
-      osc.type='sawtooth'; osc.frequency.setValueAtTime(220,ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(100,ctx.currentTime+.5);
+      osc.type='sawtooth'; osc.frequency.setValueAtTime(220,ctx.currentTime); osc.frequency.linearRampToValueAtTime(100,ctx.currentTime+.5);
       g.gain.setValueAtTime(.08,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);
       osc.start(); osc.stop(ctx.currentTime+.5);
     } else if (type==='alert') {
-      osc.type='sawtooth'; osc.frequency.setValueAtTime(400,ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(800,ctx.currentTime+.2); osc.frequency.linearRampToValueAtTime(400,ctx.currentTime+.4);
+      osc.type='sawtooth'; osc.frequency.setValueAtTime(400,ctx.currentTime); osc.frequency.linearRampToValueAtTime(800,ctx.currentTime+.2); osc.frequency.linearRampToValueAtTime(400,ctx.currentTime+.4);
       g.gain.setValueAtTime(.1,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.4);
       osc.start(); osc.stop(ctx.currentTime+.4);
     } else {
-      osc.type='triangle'; osc.frequency.setValueAtTime(600,ctx.currentTime);
-      g.gain.setValueAtTime(.04,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);
+      osc.type='triangle'; osc.frequency.setValueAtTime(600,ctx.currentTime); g.gain.setValueAtTime(.04,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);
       osc.start(); osc.stop(ctx.currentTime+.06);
     }
   } catch {}
@@ -253,16 +243,10 @@ function fmt(n,d=2) { return Number(n).toFixed(d); }
 function fmtDate(s) { if (!s) return ''; const [y,m,d]=s.split('-'); return `${d}/${m}/${y.slice(2)}`; }
 function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 
-function weekStart(dateStr) {
-  const d=new Date(dateStr); const day=d.getDay(); const diff=day===0?-6:1-day;
-  d.setDate(d.getDate()+diff); return d.toISOString().split('T')[0];
-}
+function weekStart(dateStr) { const d=new Date(dateStr); const day=d.getDay(); const diff=day===0?-6:1-day; d.setDate(d.getDate()+diff); return d.toISOString().split('T')[0]; }
 function weekEnd(dateStr) { const ws=weekStart(dateStr); const d=new Date(ws); d.setDate(d.getDate()+6); return d.toISOString().split('T')[0]; }
 function monthStart(dateStr) { return dateStr.slice(0,7)+'-01'; }
-function monthEnd(dateStr) {
-  const [y,m]=dateStr.split('-'); const last=new Date(+y, +m, 0);
-  return `${y}-${m}-${String(last.getDate()).padStart(2,'0')}`;
-}
+function monthEnd(dateStr) { const [y,m]=dateStr.split('-'); const last=new Date(+y, +m, 0); return `${y}-${m}-${String(last.getDate()).padStart(2,'0')}`; }
 
 function filterByPeriod(trades, period) {
   if (!period || period.mode==='all') return trades;
@@ -283,12 +267,10 @@ function computeStats(trades, startBal) {
   const netPnl=trades.reduce((s,t)=>s+t.pnl,0);
 
   function calcRR(t) {
-    const entryExitDist = Math.abs(t.entry - t.exit);
-    const entrySLDist   = Math.abs(t.entry - t.sl);
+    const entryExitDist = Math.abs(t.entry - t.exit); const entrySLDist   = Math.abs(t.entry - t.sl);
     if (entryExitDist === 0 || entrySLDist === 0 || t.lot === 0) return null;
     const pipVal = Math.abs(t.pnl) / (entryExitDist * t.lot);
-    const riskUSD   = entrySLDist * t.lot * pipVal;
-    const rewardUSD = Math.abs(t.pnl);
+    const riskUSD   = entrySLDist * t.lot * pipVal; const rewardUSD = Math.abs(t.pnl);
     return riskUSD > 0 ? rewardUSD / riskUSD : null;
   }
 
@@ -308,7 +290,7 @@ const state = {
   f: {
     date:today(), symbol:'GOLD', dir:'Buy', entry:'', exit:'',
     sl:'', lot:'', pnl:'', status:'TP', tf:'1H',
-    conf:false, fear:false, greed:false, account:'Demo' // 🎯 เพิ่ม Account Routing
+    conf:false, fear:false, greed:false, account:'Demo'
   },
   cf: { date:today(), type:'Deposit', amount:'', desc:'', account:'Demo' },
   filter: { symbol:'ALL', status:'ALL', period:{mode:'all'}, account:'ALL' },
@@ -319,17 +301,13 @@ const state = {
 function getTodayLosses() { return state.trades.filter(tr=>tr.date===today()&&tr.status==='SL').length; }
 function shouldShowAlert() { return getTodayLosses()>=2; }
 
-// 📡 CLOUD SAVE REFACTOR: ประกันความปลอดภัยชั้นที่ 2 ยิงข้อมูลขึ้น Firebase เสมอ
 function syncToCloud() {
   if (!isCloudActive) return;
   firebase.database().ref('retro_trading_journal_data').set({
-    trades: state.trades,
-    cfs: state.cfs,
-    balance: state.balance
+    trades: state.trades, cfs: state.cfs, balance: state.balance
   });
 }
 
-// 📡 INITIAL CLOUD INTEGRITY: ดึงค่าจากคลาวด์ ถ้าคลาวด์ว่างเปล่า ยกรหัส Local ขึ้นสำรองทันที ข้อมูลไม่หาย 100%
 function initCloudDatabase() {
   if (!isCloudActive) return;
   firebase.database().ref('retro_trading_journal_data').once('value', (snapshot) => {
@@ -340,9 +318,7 @@ function initCloudDatabase() {
       if (data.balance) state.balance = data.balance;
       save(KEY.TRADES, state.trades); save(KEY.CFS, state.cfs); save(KEY.BALANCE, state.balance);
       render();
-    } else {
-      syncToCloud(); // สำรองข้อมูลเก่าจาก localStorage ขึ้นสู่คลาวด์เอี่ยมครั้งแรก
-    }
+    } else { syncToCloud(); }
   });
 }
 
@@ -388,15 +364,13 @@ function buildHome() {
     </div>`;
 }
 function buildTradeForm() {
-  const f=state.f;
-  const symbols=['GOLD','XAUUSD','BTCUSD','US30','NAS100','EURUSD','GBPUSD','Other'];
-  const tfs=['1M','5M','15M','30M','1H','4H','D1','W1'];
+  const f=state.f; const symbols=['GOLD','XAUUSD','BTCUSD','US30','NAS100','EURUSD','GBPUSD','Other']; const tfs=['1M','5M','15M','30M','1H','4H','D1','W1'];
   return `
-    <label>🎯 บัญชี/ตลับพอร์ต</label>
+    <label>🎯 พอร์ตบัญชี</label>
     <select id="f-account">
-      <option value="Demo" ${f.account==='Demo'?'selected':''}>Demo (พอร์ตซ้อม)</option>
-      <option value="LIFE" ${f.account==='LIFE'?'selected':''}>LIFE (พอร์ตหลักคลังคลัง)</option>
-      <option value="RISK" ${f.account==='RISK'?'selected':''}>RISK (พอร์ตเสี่ยงสูงตะลุยตลาด)</option>
+      <option value="Demo" ${f.account==='Demo'?'selected':''}>Demo (พอร์ตซ้อม/ประวัติเก่า)</option>
+      <option value="LIFE" ${f.account==='LIFE'?'selected':''}>LIFE (พอร์ตจริงหลัก)</option>
+      <option value="RISK" ${f.account==='RISK'?'selected':''}>RISK (พอร์ตเสี่ยงสูง)</option>
     </select>
     <label>วันที่</label><input type="date" id="f-date" value="${f.date}">
     <label>คู่เงิน / สินทรัพย์</label><select id="f-symbol">${symbols.map(s=>`<option ${f.symbol===s?'selected':''}>${s}</option>`).join('')}</select>
@@ -428,11 +402,11 @@ function buildTradeForm() {
 function buildCFForm() {
   const cf=state.cf;
   return `
-    <label>🎯 บัญชีปลายทางเงินสด</label>
+    <label>🎯 บัญชีเงินสด</label>
     <select id="cf-account">
       <option value="Demo" ${cf.account==='Demo'?'selected':''}>Demo (พอร์ตซ้อม)</option>
-      <option value="LIFE" ${cf.account==='LIFE'?'selected':''}>LIFE (พอร์ตหลักคลังคลัง)</option>
-      <option value="RISK" ${cf.account==='RISK'?'selected':''}>RISK (พอร์ตเสี่ยงสูงตะลุยตลาด)</option>
+      <option value="LIFE" ${cf.account==='LIFE'?'selected':''}>LIFE (พอร์ตจริงหลัก)</option>
+      <option value="RISK" ${cf.account==='RISK'?'selected':''}>RISK (พอร์ตเสี่ยงสูง)</option>
     </select>
     <label>วันที่</label><input type="date" id="cf-date" value="${cf.date}">
     <label>ประเภท</label>
@@ -473,16 +447,19 @@ function buildPeriodFilter(prefix, period) {
     </div>`;
 }
 function buildTradeLog(symbols) {
-  const p=state.filter.period;
-  let filtered=[...state.trades].sort((a,b)=>b.date.localeCompare(a.date));
-  filtered=filterByPeriod(filtered,p);
+  const p=state.filter.period; let filtered=[...state.trades].sort((a,b)=>b.date.localeCompare(a.date)); filtered=filterByPeriod(filtered,p);
   if (state.filter.symbol!=='ALL') filtered=filtered.filter(t=>t.symbol===state.filter.symbol);
   if (state.filter.status!=='ALL') filtered=filtered.filter(t=>t.status===state.filter.status);
-  if (state.filter.account!=='ALL') filtered=filtered.filter(t=>t.account===state.filter.account);
+  if (state.filter.account!=='ALL') filtered=filtered.filter(t=>(t.account||'Demo')===state.filter.account);
   return `
     ${buildPeriodFilter('log',p)}
     <div class="filter-row" style="gap:4px;margin-bottom:10px">
-      <select id="flt-account" style="flex:1;font-size:7px"><option value="ALL">ALL ACCOUNTS</option><option value="Demo">Demo</option><option value="LIFE">LIFE</option><option value="RISK">RISK</option></select>
+      <select id="flt-account" style="flex:1;font-size:7px">
+        <option value="ALL" ${state.filter.account==='ALL'?'selected':''}>ALL ACCOUNTS</option>
+        <option value="Demo" ${state.filter.account==='Demo'?'selected':''}>Demo</option>
+        <option value="LIFE" ${state.filter.account==='LIFE'?'selected':''}>LIFE</option>
+        <option value="RISK" ${state.filter.account==='RISK'?'selected':''}>RISK</option>
+      </select>
       <select id="flt-symbol" style="flex:1;font-size:7px">${symbols.map(s=>`<option ${state.filter.symbol===s?'selected':''}>${s}</option>`).join('')}</select>
       <select id="flt-status" style="flex:1;font-size:7px">${['ALL','TP','SL','BE'].map(s=>`<option ${state.filter.status===s?'selected':''}>${s}</option>`).join('')}</select>
     </div>
@@ -499,13 +476,16 @@ function buildTradeItem(t) {
       <div class="trade-row"><span class="trade-label">DATE</span><span class="trade-value">${fmtDate(t.date)}</span></div>
       <div class="trade-row"><span class="trade-label">ENTRY / EXIT</span><span class="trade-value">${fmt(t.entry,2)} → ${fmt(t.exit,2)}</span></div>
       <div class="trade-row"><span class="trade-label">SL / LOT</span><span class="trade-value">${fmt(t.sl,2)} / ${t.lot}</span></div>
+      <div class="trade-row"><span class="trade-label">TF</span><span class="trade-value">${t.tf||'5M'}</span></div>
       <div class="trade-row"><span class="trade-label">P&L</span><span class="${pnlClass}">${pnlSign}$${fmt(t.pnl,2)}</span></div>
       ${emTags?`<div style="margin-top:4px;font-size:10px">${emTags}</div>`:''}
       <div style="margin-top:6px;text-align:right"><button class="del-btn" data-del-trade="${t.id}">✕ DEL</button></div>
     </div>`;
 }
 function buildCFLog() {
-  const sorted=[...state.cfs].sort((a,b)=>b.date.localeCompare(a.date)); if (sorted.length===0) return `<div class="empty">ไม่มีรายการ</div>`;
+  let sorted=[...state.cfs].sort((a,b)=>b.date.localeCompare(a.date));
+  if (state.filter.account!=='ALL') sorted=sorted.filter(c=>(c.account||'Demo')===state.filter.account);
+  if (sorted.length===0) return `<div class="empty">ไม่มีรายการ</div>`;
   return sorted.map(cf=>`
     <div class="cf-item">
       <div>
@@ -519,21 +499,49 @@ function buildCFLog() {
     </div>`).join('');
 }
 function buildStats() {
-  const p=state.statsPeriod; const allTrades=state.trades; const filtered=filterByPeriod(allTrades,p); const todayTrades=allTrades.filter(tr=>tr.date===today()); const todayPnl=todayTrades.reduce((s,tr)=>s+tr.pnl,0); const st=computeStats(filtered,state.balance); const netDeposit=state.cfs.reduce((s,cf)=>s+(cf.type==='Deposit'?cf.amount:-cf.amount),0); const equity=state.balance+netDeposit+allTrades.reduce((s,t)=>s+t.pnl,0);
+  const p=state.statsPeriod; const allTrades=state.trades; 
+  let filtered=filterByPeriod(allTrades,p);
+  if (p.account && p.account !== 'ALL') filtered = filtered.filter(t => (t.account || 'Demo') === p.account);
+
+  const todayTrades=allTrades.filter(tr=>tr.date===today()); const todayPnl=todayTrades.reduce((s,tr)=>s+tr.pnl,0); const st=computeStats(filtered,state.balance); 
+  const netDeposit=state.cfs.filter(c=>p.account==='ALL'||(c.account||'Demo')===p.account).reduce((s,cf)=>s+(cf.type==='Deposit'?cf.amount:-cf.amount),0); 
+  const equity=state.balance+netDeposit+filtered.reduce((s,t)=>s+t.pnl,0);
   return `
     <div class="card">
       <div class="card-title"><span>📊 STATISTICS</span></div>
       <div style="color:#555;font-size:7px;margin-bottom:6px">วันนี้</div>
       <div class="stats-grid"><div class="stat-box"><div class="stat-label">P&L TODAY</div><div class="stat-value ${todayPnl>=0?'pnl-pos':'pnl-neg'}">${todayPnl>=0?'+':''}$${fmt(todayPnl,2)}</div></div></div>
       <div class="divider"></div>
+      <div style="color:#555;font-size:7px;margin-bottom:6px">ภาพรวมคัดแยกคลังบัญชี</div>
       ${buildPeriodFilter('stats',p)}
+      <div class="filter-row" style="margin-bottom:10px">
+        <select id="stats-account" style="width:100%;font-size:7px">
+          <option value="ALL" ${p.account==='ALL'?'selected':''}>ALL ACCOUNTS STATS</option>
+          <option value="Demo" ${p.account==='Demo'?'selected':''}>Demo (ประวัติซ้อมเก่า)</option>
+          <option value="LIFE" ${p.account==='LIFE'?'selected':''}>LIFE</option>
+          <option value="RISK" ${p.account==='RISK'?'selected':''}>RISK</option>
+        </select>
+      </div>
       <div class="stats-grid">
         <div class="stat-box"><div class="stat-label">EQUITY</div><div class="stat-value ${equity>=state.balance?'pnl-pos':'pnl-neg'}">$${fmt(equity,0)}</div></div>
         <div class="stat-box"><div class="stat-label">WIN RATE</div><div class="stat-value pnl-pos">${st.wr}%</div></div>
         <div class="stat-box"><div class="stat-label">NET P&L</div><div class="stat-value ${st.netPnl>=0?'pnl-pos':'pnl-neg'}">${st.netPnl>=0?'+':''}$${fmt(st.netPnl,2)}</div></div>
         <div class="stat-box"><div class="stat-label">TOTAL TRADE</div><div class="stat-value" style="color:#88aaff">${st.total}</div></div>
+        <div class="stat-box" style="grid-column:span 2">
+          <div class="stat-label" style="margin-bottom:6px">RESULT SUMMARY</div>
+          <div style="display:flex;justify-content:space-around">
+            <div><div style="font-size:7px;color:#555;margin-bottom:3px">WIN</div><div class="pnl-pos" style="font-size:11px">${st.wins}</div></div>
+            <div><div style="font-size:7px;color:#555;margin-bottom:3px">BE</div><div class="pnl-be" style="font-size:11px">${st.bes}</div></div>
+            <div><div style="font-size:7px;color:#555;margin-bottom:3px">LOSE</div><div class="pnl-neg" style="font-size:11px">${st.loses}</div></div>
+          </div>
+        </div>
+        <div class="stat-box"><div class="stat-label">START CAP</div><div class="stat-value" style="color:#aaa;font-size:9px">$${fmt(state.balance,0)}</div></div>
+        <div class="stat-box"><div class="stat-label">AVG R:R</div><div class="stat-value" style="color:#88aaff;font-size:9px">${st.avgRR}</div></div>
+        <div class="stat-box"><div class="stat-label">HIGH WIN R:R</div><div class="stat-value pnl-pos" style="font-size:9px">${st.highWinRR}</div></div>
+        <div class="stat-box"><div class="stat-label">HIGH LOSE R:R</div><div class="stat-value pnl-neg" style="font-size:9px">${st.highLoseRR}</div></div>
       </div>
       ${buildEquityCurve(filtered)}
+      ${buildPieChart(st)}
     </div>`;
 }
 function buildEquityCurve(trades) {
@@ -550,6 +558,60 @@ function buildEquityCurve(trades) {
       </svg>
     </div>`;
 }
+
+// 🥧 100% VERBATIM PIE CHART RECOVERY ENGINE
+function buildPieChart(st) {
+  const total=st.wins+st.loses+st.bes;
+  if (total===0) return `<div class="empty" style="margin-top:12px">ไม่มีข้อมูล pie chart</div>`;
+
+  const cx=60,cy=60,r=50;
+  const slices=[
+    {label:'Win', val:st.wins, color:'#00cc44'},
+    {label:'BE',  val:st.bes,  color:'#666666'},
+    {label:'Lose',val:st.loses,color:'#cc2222'},
+  ].filter(s=>s.val>0);
+
+  let paths='';
+  let startAngle=-Math.PI/2;
+  slices.forEach(s=>{
+    const angle=(s.val/total)*Math.PI*2;
+    const endAngle=startAngle+angle;
+    const x1=cx+r*Math.cos(startAngle);
+    const y1=cy+r*Math.sin(startAngle);
+    const x2=cx+r*Math.cos(endAngle);
+    const y2=cy+r*Math.sin(endAngle);
+    const large=angle>Math.PI?1:0;
+    if (slices.length===1) {
+      paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${s.color}" opacity="0.85"/>`;
+    } else {
+      paths+=`<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${s.color}" opacity="0.85" stroke="#000" stroke-width="1"/>`;
+    }
+    startAngle=endAngle;
+  });
+
+  const legend=[
+    {label:'Win', pct:st.wins,  color:'#00cc44'},
+    {label:'BE',  pct:st.bes,   color:'#666666'},
+    {label:'Lose',pct:st.loses, color:'#cc2222'},
+  ];
+
+  return `
+    <div style="margin-top:12px;color:#555;font-size:7px;margin-bottom:4px">🥧 WIN/BE/LOSE RATIO</div>
+    <div class="pie-wrap">
+      <svg width="120" height="120" style="flex-shrink:0">
+        ${paths}
+      </svg>
+      <div class="pie-legend">
+        ${legend.map(l=>`
+          <div class="pie-legend-item">
+            <div class="pie-dot" style="background:${l.color}"></div>
+            <span style="color:#aaa">${l.label}</span>
+            <span style="color:#fff">${l.pct} <span style="color:#555">(${total>0?(l.pct/total*100).toFixed(0):0}%)</span></span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
 function buildSettings() {
   return `
     <div class="card">
@@ -559,6 +621,14 @@ function buildSettings() {
         <span style="color:#888;font-size:8px">Starting Balance ($)</span>
         ${state.editBal?`<div style="display:flex;gap:6px;width:100%"><input type="number" id="bal-input" value="${state.tempBal}" style="margin-bottom:0;flex:1"><button class="btn" id="btn-save-bal">OK</button></div>`:`<div style="display:flex;gap:8px;align-items:center"><span style="color:#88aaff;font-size:11px">$${fmt(state.balance,0)}</span><button class="btn" id="btn-edit-bal" style="margin-top:0;font-size:7px">EDIT</button></div>`}
       </div>
+      <div class="divider"></div>
+      <div style="color:#555;font-size:7px;margin-bottom:8px">💾 DATA MANAGEMENT</div>
+      <button class="btn btn-green" id="btn-backup" style="margin-bottom:8px">▼ BACKUP DATA</button>
+      <button class="btn" id="btn-import-trigger" style="margin-bottom:8px">▲ IMPORT DATA</button>
+      <input type="file" id="btn-import" accept=".json" style="display:none">
+      <div class="divider"></div>
+      <div style="color:#555;font-size:7px;margin-bottom:8px">⚠ DANGER ZONE</div>
+      <button class="btn btn-red" id="btn-clear-trades">✕ ลบ Trade ทั้งหมด</button>
     </div>`;
 }
 
@@ -581,6 +651,11 @@ function attachEvents() {
   const fltAcc=document.getElementById('flt-account'); if(fltAcc) fltAcc.addEventListener('change',e=>{ state.filter.account=e.target.value; render(); });
   const fltSym=document.getElementById('flt-symbol'); if(fltSym) fltSym.addEventListener('change',e=>{ state.filter.symbol=e.target.value; render(); });
   const fltSt=document.getElementById('flt-status'); if(fltSt) fltSt.addEventListener('change',e=>{ state.filter.status=e.target.value; render(); });
+  
+  const statsAcc=document.getElementById('stats-account'); if(statsAcc) statsAcc.addEventListener('change',e=>{ state.statsPeriod.account=e.target.value; render(); });
+
+  bindPeriodFilter('log', state.filter.period, (p)=>{ state.filter.period=p; render(); });
+  bindPeriodFilter('stats', state.statsPeriod, (p)=>{ state.statsPeriod=p; render(); });
 
   const btnTrade=document.getElementById('btn-add-trade');
   if(btnTrade) btnTrade.addEventListener('click',()=>{
@@ -604,6 +679,40 @@ function attachEvents() {
   const tog=document.getElementById('toggle-sound'); if(tog) tog.addEventListener('click',()=>{ state.sound=!state.sound; save(KEY.SOUND,state.sound); render(); });
   const btnEditBal=document.getElementById('btn-edit-bal'); if(btnEditBal) btnEditBal.addEventListener('click',()=>{ state.editBal=true; state.tempBal=state.balance; render(); });
   const btnSaveBal=document.getElementById('btn-save-bal'); if(btnSaveBal) btnSaveBal.addEventListener('click',()=>{ const v=parseFloat(state.tempBal); if(!isNaN(v)&&v>=0){ state.balance=v; save(KEY.BALANCE,v); syncToCloud(); } state.editBal=false; render(); });
+  
+  const btnClear=document.getElementById('btn-clear-trades'); if(btnClear) btnClear.addEventListener('click',()=>{ if(!confirm('ลบ trade ทั้งหมด? ยืนยัน?')) return; state.trades=[]; save(KEY.TRADES,[]); syncToCloud(); render(); });
+
+  const btnBackup=document.getElementById('btn-backup');
+  if(btnBackup) btnBackup.addEventListener('click',()=>{
+    const data={ version:3, exportedAt:new Date().toISOString(), balance:state.balance, trades:state.trades, cfs:state.cfs };
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`rtj-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); if(state.sound) beep('win');
+  });
+
+  const btnImportTrigger=document.getElementById('btn-import-trigger'); if(btnImportTrigger) btnImportTrigger.addEventListener('click',()=>{ document.getElementById('btn-import')?.click(); });
+
+  const importInput=document.getElementById('btn-import');
+  if(importInput) importInput.addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file) return; const reader=new FileReader();
+    reader.onload=ev=>{
+      try {
+        const data=JSON.parse(ev.target.result); if(!data.trades||!Array.isArray(data.trades)){ alert('ไฟล์ไม่ถูกต้อง!'); return; }
+        if(!confirm(`Import ${data.trades.length} trades?\n(ข้อมูลเดิมจะถูกแทนที่)`)) return;
+        if(data.balance) { state.balance=data.balance; save(KEY.BALANCE,data.balance); }
+        state.trades=data.trades; save(KEY.TRADES,state.trades);
+        state.cfs=data.cfs||[]; save(KEY.CFS,state.cfs);
+        syncToCloud(); if(state.sound) beep('win'); render(); alert('✅ Import และซิงก์ขึ้น Cloud สำเร็จ!');
+      } catch { alert('❌ ไฟล์เสีย อ่านไม่ได้!'); }
+    }; reader.readAsText(file); e.target.value='';
+  });
+}
+
+function bindPeriodFilter(prefix, period, onChange) {
+  const modeEl=document.getElementById(`${prefix}-period-mode`); if(!modeEl) return;
+  modeEl.addEventListener('change',e=>{ const newP={mode:e.target.value, account: period.account}; if(e.target.value==='daily') newP.date=today(); onChange(newP); });
+  const dateEl=document.getElementById(`${prefix}-period-date`); if(dateEl) dateEl.addEventListener('change',e=>{ onChange({...period, date:e.target.value}); });
+  const fromEl=document.getElementById(`${prefix}-period-from`); if(fromEl) fromEl.addEventListener('change',e=>{ onChange({...period, from:e.target.value}); });
+  const toEl=document.getElementById(`${prefix}-period-to`); if(toEl) toEl.addEventListener('change',e=>{ onChange({...period, to:e.target.value}); });
 }
 
 // 📡 BOOT ENGINE
