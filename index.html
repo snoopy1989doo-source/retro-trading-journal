@@ -691,18 +691,43 @@ function attachEvents() {
 
   const btnImportTrigger=document.getElementById('btn-import-trigger'); if(btnImportTrigger) btnImportTrigger.addEventListener('click',()=>{ document.getElementById('btn-import')?.click(); });
 
+  // 💾 UNIVERSAL SMART IMPORT ENGINE (แก้ไขบั๊กการดักจับรูปแบบไฟล์)
   const importInput=document.getElementById('btn-import');
   if(importInput) importInput.addEventListener('change',e=>{
     const file=e.target.files[0]; if(!file) return; const reader=new FileReader();
     reader.onload=ev=>{
       try {
-        const data=JSON.parse(ev.target.result); if(!data.trades||!Array.isArray(data.trades)){ alert('ไฟล์ไม่ถูกต้อง!'); return; }
-        if(!confirm(`Import ${data.trades.length} trades?\n(ข้อมูลเดิมจะถูกแทนที่)`)) return;
-        if(data.balance) { state.balance=data.balance; save(KEY.BALANCE,data.balance); }
-        state.trades=data.trades; save(KEY.TRADES,state.trades);
-        state.cfs=data.cfs||[]; save(KEY.CFS,state.cfs);
-        syncToCloud(); if(state.sound) beep('win'); render(); alert('✅ Import และซิงก์ขึ้น Cloud สำเร็จ!');
-      } catch { alert('❌ ไฟล์เสีย อ่านไม่ได้!'); }
+        const data=JSON.parse(ev.target.result);
+        let importedTrades = [];
+        let importedCfs = [];
+        
+        // ตรวจสอบโครงสร้างข้อมูลแบบยืดหยุ่น (คัดกรองทุกสไตล์ของไฟล์ Backup)
+        if (Array.isArray(data)) {
+          importedTrades = data;
+        } else if (data && Array.isArray(data.trades)) {
+          importedTrades = data.trades;
+          importedCfs = data.cfs || [];
+          if (data.balance) { 
+            state.balance = parseFloat(data.balance) || state.balance; 
+            save(KEY.BALANCE, state.balance); 
+          }
+        } else {
+          alert('รูปแบบโครงสร้างไฟล์ไม่ถูกต้อง!'); return;
+        }
+
+        if(!confirm(`พบข้อมูลประวัติการเทรด ${importedTrades.length} ไม้\nต้องการกดนำเข้าเพื่อแทนที่พอร์ตปัจจุบันใช่หรือไม่?`)) return;
+        
+        state.trades = importedTrades; save(KEY.TRADES, state.trades);
+        state.cfs = importedCfs; save(KEY.CFS, state.cfs);
+        
+        // ทำการสั่งส่งสำเนาข้อมูลข้ามระบบคลาวด์ไปยังฐานข้อมูลกลางทันที
+        syncToCloud(); 
+        if(state.sound) beep('win'); 
+        render(); 
+        alert('✅ ระบบนำเข้าและซิงก์ข้อมูลขึ้นคลาวด์เสร็จสมบูรณ์!');
+      } catch (err) { 
+        alert('❌ ไม่สามารถอ่านไฟล์ได้ โครงสร้าง JSON เสียหาย!'); 
+      }
     }; reader.readAsText(file); e.target.value='';
   });
 }
