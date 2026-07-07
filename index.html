@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>RETRO TRADER JOURNAL - V.3.4 ARCADE SYSTEM</title>
+<title>RETRO TRADER JOURNAL - V.3.5 CALENDAR SYSTEM</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <!-- ฝัง Firebase Compatibility SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -160,6 +160,35 @@ input:focus,select:focus{color:#fff;border-color:#00ffff;box-shadow: 0 0 5px #00
   font-size: 7px; margin-bottom: 4px; color: #ff4466;
 }
 
+/* 📅 TRADING CALENDAR SYSTEM UI (Based on 1783447080060.jpg) */
+.cal-box {
+  grid-column: span 2; border: 3px inset #ff00aa;
+  background: rgba(4, 2, 10, 0.95); padding: 12px; margin-top: 10px;
+  box-shadow: 0 0 15px rgba(255, 0, 170, 0.2);
+}
+.cal-header-layout {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+}
+.cal-grid-mesh {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;
+}
+.cal-weekday { color: #00ffff; font-size: 6px; padding-bottom: 4px; border-bottom: 1px solid #440088; }
+.cal-day-node {
+  min-height: 42px; padding: 3px 2px; display: flex; flex-direction: column;
+  justify-content: space-between; font-size: 6px; border: 1px solid #221133;
+}
+.cal-day-idx { text-align: left; color: #777; font-size: 6px; }
+.cal-day-pnl { font-weight: bold; font-size: 5px; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+.cal-day-count { color: #666; font-size: 5px; text-align: right; }
+
+/* Calendar Node Adaptive Background Skins */
+.skin-cal-win { background: #002b11 !important; border: 1px solid #00ff66 !important; color: #00ff66 !important; }
+.skin-cal-win .cal-day-idx, .skin-cal-win .cal-day-count { color: #00ff66 !important; }
+.skin-cal-loss { background: #26000c !important; border: 1px solid #ff0033 !important; color: #ff4466 !important; }
+.skin-cal-loss .cal-day-idx, .skin-cal-loss .cal-day-count { color: #ff4466 !important; }
+.skin-cal-blank { background: #090514; color: #333; opacity: 0.25; }
+.skin-cal-neutral { background: #0f0b21; border: 1px solid #332255; }
+
 .cf-item{
   border:2px outset #00ff00;background:#020a02;
   padding:8px;margin-bottom:6px;
@@ -218,7 +247,7 @@ const KEY = {
   CFS:     'rtj_cfs_v2',
   BALANCE: 'rtj_balance_v2',
   SOUND:   'rtj_sound_v2',
-  CRT:     'rtj_crt_v2' // สวิตช์จอแก้วตัวใหม่
+  CRT:     'rtj_crt_v2'
 }; //[cite: 1]
 
 function load(key, def) {
@@ -271,7 +300,6 @@ function filterByPeriod(trades, period) {
   return trades;
 } //[cite: 1]
 
-// ─── 📊 ADVANCED STATS CALCULATION CORE (Multi-Account Compliant) ─────────
 function computeStats(trades, startBal) {
   const total=trades.length;
   const wins=trades.filter(t=>t.status==='TP').length;
@@ -295,27 +323,25 @@ function computeStats(trades, startBal) {
   const highWinRR= winRRs.length>0 ? Math.max(...winRRs).toFixed(2)+'R' : '-';
   const highLoseRR=loseRRs.length>0? Math.max(...loseRRs).toFixed(2)+'R': '-';
 
-  // 1. PROFIT FACTOR ENGINE
   const grossProfit = trades.filter(t=>t.pnl > 0).reduce((s,t)=>s+t.pnl, 0);
   const grossLoss = Math.abs(trades.filter(t=>t.pnl < 0).reduce((s,t)=>s+t.pnl, 0));
   const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '0.00');
-
-  // 2. EXPECTANCY ENGINE
   const expectancy = total > 0 ? (netPnl / total).toFixed(2) : '0.00';
 
-  // 3. PSYCHOLOGY REVENUE LEAK ENGINE (คำนวณเฉพาะไม้ที่ Loss)
   const lossTrades = trades.filter(t=>t.pnl < 0);
   const greedCost = Math.abs(lossTrades.filter(t=>t.psychology && t.psychology.greed).reduce((s,t)=>s+t.pnl, 0));
   const fearCost = Math.abs(lossTrades.filter(t=>t.psychology && t.psychology.fear).reduce((s,t)=>s+t.pnl, 0));
 
   return {total,wins,loses,bes,wr,netPnl,avgRR,highWinRR,highLoseRR,profitFactor,expectancy,greedCost,fearCost};
-}
+} //[cite: 1]
 
 const state = {
   page:     'HOME', inputTab: 'TRADE', logTab:   'TRADE',
   sound:    load(KEY.SOUND,true), balance:  load(KEY.BALANCE,10000),
   trades:   load(KEY.TRADES,[]), cfs:      load(KEY.CFS,[]),
   crt:      load(KEY.CRT, true),
+  calYear:  new Date().getFullYear(),  // ปฏิทินเริ่มต้นปีปัจจุบัน
+  calMonth: new Date().getMonth(),     // ปฏิทินเริ่มต้นเดือนปัจจุบัน (0-11)
   f: {
     date:today(), symbol:'GOLD', dir:'Buy', entry:'', exit:'',
     sl:'', lot:'', pnl:'', status:'TP', tf:'1H',
@@ -552,7 +578,74 @@ function buildCFLog() {
     </div>`).join('');
 } //[cite: 1]
 
-// ─── 📊 UPGRADED STATS INTERFACE (Arcade Mechanical Style) ──────────────────
+// ─── 📅 TRADING CALENDAR GENERATOR ENGINE (1783447080060.jpg Mechanics) ───
+function buildCalendarSection(allTrades, accountFilter) {
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const year = state.calYear;
+  const month = state.calMonth;
+
+  // หาจำนวนวันทั้งหมดในเดือนนี้ และวันแรกของสัปดาห์
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const adjustedFirstDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1; // ปรับให้เริ่มต้นที่วันจันทร์ตามภาพสเก็ตช์
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  const weekdays = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+  let htmlMesh = weekdays.map(w => `<div class="cal-weekday">${w}</div>`).join('');
+
+  // พ่นช่องว่างของเดือนก่อนหน้า
+  for (let i = 0; i < adjustedFirstDay; i++) {
+    htmlMesh += `<div class="cal-day-node skin-cal-blank"></div>`;
+  }
+
+  // ลูปประมวลผลรายวัน
+  for (let day = 1; day <= totalDays; day++) {
+    const currentStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // ฟิลเตอร์คัดเลือกไม้เทรดเฉพาะของวันและบัญชีนี้
+    let dayTrades = allTrades.filter(t => t.date === currentStr);
+    if (accountFilter !== 'ALL') {
+      dayTrades = dayTrades.filter(t => (t.account || 'Demo') === accountFilter);
+    }
+
+    const tradeCount = dayTrades.length;
+    const totalPnl = dayTrades.reduce((s, t) => s + t.pnl, 0);
+
+    let skinClass = "skin-cal-neutral";
+    let pnlDisplay = "$0.00";
+    if (tradeCount > 0) {
+      if (totalPnl > 0) { skinClass = "skin-cal-win"; pnlDisplay = `+$${totalPnl.toFixed(2)}`; }
+      else if (totalPnl < 0) { skinClass = "skin-cal-loss"; pnlDisplay = `-$${Math.abs(totalPnl).toFixed(2)}`; }
+    }
+
+    htmlMesh += `
+      <div class="cal-day-node ${skinClass}">
+        <div class="cal-day-idx">${day}</div>
+        <div class="cal-day-pnl">${tradeCount > 0 ? pnlDisplay : '$0.00'}</div>
+        <div class="cal-day-count">${tradeCount} ${tradeCount === 1 ? 'trade' : 'trades'}</div>
+      </div>`;
+  }
+
+  // ปิดตารางให้ครบสัปดาห์
+  const totalCells = adjustedFirstDay + totalDays;
+  const remainingCells = (7 - (totalCells % 7)) % 7;
+  for (let i = 0; i < remainingCells; i++) {
+    htmlMesh += `<div class="cal-day-node skin-cal-blank"></div>`;
+  }
+
+  return `
+    <div class="cal-box">
+      <div class="cal-header-layout">
+        <button class="btn" id="cal-prev" style="width:45px; margin:0; padding:6px 0;"><</button>
+        <span class="glow-cyan" style="font-size:9px;">${monthNames[month]} ${year}</span>
+        <button class="btn" id="cal-next" style="width:45px; margin:0; padding:6px 0;">></button>
+      </div>
+      <div class="cal-grid-mesh">
+        ${htmlMesh}
+      </div>
+    </div>`;
+}
+
+// ─── 📊 STATS INTERFACE WITH CALENDAR INTEGRATION ──────────────────────────
 function buildStats() {
   const p=state.statsPeriod; const allTrades=state.trades; 
   let filtered=filterByPeriod(allTrades,p);
@@ -595,7 +688,6 @@ function buildStats() {
           <div class="stat-value glow-cyan">$${fmt(equity,0)}</div>
         </div>
         
-        <!-- 🔋 ARCADE HP LIFEBAR COMPONENT -->
         <div class="stat-box">
           <div class="stat-label">WIN RATE ARCADE HP</div>
           <div class="stat-value glow-green" style="font-size:9px;">${st.wr}%</div>
@@ -613,7 +705,6 @@ function buildStats() {
           <div class="stat-value" style="color:#00ffff">${st.total}</div>
         </div>
 
-        <!-- INTERNATIONAL METRICS GRID -->
         <div class="stat-box">
           <div class="stat-label">PROFIT FACTOR (GP/GL)</div>
           <div class="stat-value ${pfClass}">${st.profitFactor}</div>
@@ -637,7 +728,6 @@ function buildStats() {
         <div class="stat-box"><div class="stat-label">MAX WIN R:R</div><div class="stat-value glow-green" style="font-size:8px">${st.highWinRR}</div></div>
         <div class="stat-box"><div class="stat-label">MAX LOSE R:R</div><div class="stat-value glow-red" style="font-size:8px">${st.highLoseRR}</div></div>
 
-        <!-- ⚠️ BACKSTAGE PSYCHOLOGY COST DISCLOSURE BOX -->
         <div class="psych-cost-box">
           <div style="color:#ff0033; font-size:7px; margin-bottom:6px; text-shadow: 0 0 3px #ff0033;">⚠️ PSYCHOLOGY COST ANALYSIS (LEAKED CAPITAL)</div>
           <div class="psych-cost-row">
@@ -649,6 +739,10 @@ function buildStats() {
             <span class="glow-red">-$${fmt(st.fearCost,2)}</span>
           </div>
         </div>
+
+        <!-- 📅 NEW ADVANCED TRADING CALENDAR MODULE (บดขยี้พื้นที่ว่างเปล่า) -->
+        ${buildCalendarSection(allTrades, p.account)}
+
       </div>
       
       ${buildEquityCurve(filtered)}
@@ -710,21 +804,17 @@ function buildSettings() {
   return `
     <div class="card">
       <div class="card-title"><span>⚙ CONFIG OPERATIONS</span></div>
-      
-      <!-- 📺 MONITOR CRT SCANLINE TOGGLE ENGINE -->
       <div class="setting-row">
         <span>จอแก้ว CRT FILTER</span>
         <div class="toggle" id="toggle-crt"><div class="toggle-knob ${state.crt?'on':'off'}"></div></div>
       </div>
-
       <div class="setting-row">
         <span>เสียง 8-bit ALERTS</span>
         <div class="toggle" id="toggle-sound"><div class="toggle-knob ${state.sound?'on':'off'}"></div></div>
       </div>
-      
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
         <span style="color:#666;font-size:8px">Starting Balance ($)</span>
-        ${state.editBal?`<div style="display:flex;gap:6px;width:100%"><input type="number" id="bal-input" value="${state.tempBal}" style="margin-bottom:0;flex:1"><button class="btn" id="btn-save-bal">OK</button></div>`:`<div style="display:flex;gap:8px;align-items:center"><span class="glow-cyan" style="font-size:11px">$${fmt(state.balance,0)}</span><button class="btn" id="btn-edit-bal" style="margin-top:0;font-size:7px">EDIT CAP</button></div>`}
+        ${state.editBal?`<div style="display:flex;gap:6px;width:100%"><input type="number" id="bal-input" value="${state.tempBal}" style="margin-bottom:0;flex:1"><button class="btn" id="bal-save-btn">OK</button></div>`:`<div style="display:flex;gap:8px;align-items:center"><span class="glow-cyan" style="font-size:11px">$${fmt(state.balance,0)}</span><button class="btn" id="btn-edit-bal" style="margin-top:0;font-size:7px">EDIT CAP</button></div>`}
       </div>
       <div class="divider"></div>
       <div style="color:#666;font-size:7px;margin-bottom:8px">💾 DATA DISK MANAGEMENT</div>
@@ -783,20 +873,22 @@ function attachEvents() {
   document.querySelectorAll('[data-del-cf]').forEach(el=>{ el.addEventListener('click',()=>{ if(!confirm('ลบรายการกระแสเงินสดนี้?')) return; state.cfs=state.cfs.filter(c=>c.id!==el.dataset.delCf); save(KEY.CFS, state.cfs); syncToCloud(); render(); }); }); //[cite: 1]
   
   const tog=document.getElementById('toggle-sound'); if(tog) tog.addEventListener('click',()=>{ state.sound=!state.sound; save(KEY.SOUND,state.sound); render(); }); //[cite: 1]
-  
-  // Event control สวิตช์จอแก้ว CRT
   const togCrt=document.getElementById('toggle-crt'); if(togCrt) togCrt.addEventListener('click',()=>{ state.crt=!state.crt; save(KEY.CRT, state.crt); render(); });
 
   const btnEditBal=document.getElementById('btn-edit-bal'); if(btnEditBal) btnEditBal.addEventListener('click',()=>{ state.editBal=true; state.tempBal=state.balance; render(); }); //[cite: 1]
-  const btnSaveBal=document.getElementById('btn-save-bal'); if(btnSaveBal) btnSaveBal.addEventListener('click',()=>{ const v=parseFloat(state.tempBal); if(!isNaN(v)&&v>=0){ state.balance=v; save(KEY.BALANCE,v); syncToCloud(); } state.editBal=false; render(); }); //[cite: 1]
+  
+  const btnSaveBal=document.getElementById('bal-save-btn');
+  if(btnSaveBal) btnSaveBal.addEventListener('click',()=>{
+    const v=parseFloat(state.tempBal); if(!isNaN(v)&&v>=0){ state.balance=v; save(KEY.BALANCE,v); syncToCloud(); } state.editBal=false; render();
+  });
   
   const btnClear=document.getElementById('btn-clear-trades'); if(btnClear) btnClear.addEventListener('click',()=>{ if(!confirm('⚠️ คำเตือนขั้นเด็ดขาด: ต้องการลบประวัติการเทรดทั้งหมดออกจากระบบจริงหรือไม่?')) return; state.trades=[]; save(KEY.TRADES,[]); syncToCloud(); render(); }); //[cite: 1]
 
   const btnBackup=document.getElementById('btn-backup');
   if(btnBackup) btnBackup.addEventListener('click',()=>{
-    const data={ version:4, exportedAt:new Date().toISOString(), balance:state.balance, trades:state.trades, cfs:state.cfs }; //[cite: 1]
+    const data={ version:5, exportedAt:new Date().toISOString(), balance:state.balance, trades:state.trades, cfs:state.cfs }; //[cite: 1]
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); //[cite: 1]
-    const a=document.createElement('a'); a.href=url; a.download=`rtj-arcade-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); beep('win'); //[cite: 1]
+    const a=document.createElement('a'); a.href=url; a.download=`rtj-arcade-calendar-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); beep('win'); //[cite: 1]
   });
 
   const btnImportTrigger=document.getElementById('btn-import-trigger'); if(btnImportTrigger) btnImportTrigger.addEventListener('click',()=>{ document.getElementById('btn-import')?.click(); }); //[cite: 1]
@@ -820,6 +912,21 @@ function attachEvents() {
       } catch (err) { alert('❌ JSON Corrupted! อ่านไฟล์ล้มเหลว'); } //[cite: 1]
     }; reader.readAsText(file); e.target.value='';
   }); //[cite: 1]
+
+  // 🕹️ CALENDAR NAVIGATION CONTROLLER ACTION EVENT LISTENERS
+  const calPrev = document.getElementById('cal-prev');
+  if(calPrev) calPrev.onclick = () => {
+    state.calMonth--;
+    if(state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+    beep('click'); render();
+  };
+
+  const calNext = document.getElementById('cal-next');
+  if(calNext) calNext.onclick = () => {
+    state.calMonth++;
+    if(state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+    beep('click'); render();
+  };
 }
 
 function bindPeriodFilter(prefix, period, onChange) {
