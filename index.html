@@ -279,7 +279,7 @@ input:focus,select:focus{color:#F5F5F5;border-color:#33D6FF;}
 <!-- 👾 MASTER HEADER LINK TO PIXEL STEWARD -->
 <div class="master-header">
   <span class="master-title">🕹️ ARCADE STATION V.3.7</span>
-  <a href="../pixel-steward/" class="pixel-steward-link">► PIXEL STEWARD</a>
+  <a href="https://snoopy1989doo-source.github.io/Pixel-Stewart/" class="pixel-steward-link" target="_blank" rel="noopener noreferrer">► PIXEL STEWARD</a>
 </div>
 
 <div id="app"></div>
@@ -544,8 +544,13 @@ function buildAlert() {
     </div>`;
 }
 
+// 🕹️ UPDATED BOTTOM NAVIGATION (REMOVED SET TAB)
 function buildNav() {
-  const pages=[{id:'HOME',icon:'📝',label:'INPUT'},{id:'LOG',icon:'📋',label:'LOG'},{id:'STATS',icon:'📊',label:'STATS'},{id:'SETTINGS',icon:'⚙',label:'SET'}];
+  const pages=[
+    {id:'HOME',icon:'📝',label:'INPUT'},
+    {id:'LOG',icon:'📋',label:'LOG'},
+    {id:'STATS',icon:'📊',label:'STATS'}
+  ];
   return `<div class="bottom-nav">
     ${pages.map(p=>`<button class="nav-btn ${state.page===p.id?'active':''}" data-nav="${p.id}"><span class="nav-icon">${p.icon}</span>${p.label}</button>`).join('')}
   </div>`;
