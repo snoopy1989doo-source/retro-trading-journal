@@ -9,232 +9,268 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
-/* ─── ARCADE TRADING STATION CORE THEME ─────────────────────────────────── */
+/* ─── PREMIUM RETRO 8-BIT RPG TRADING STATION THEME ─────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  background:#020208;color:#eee;
+  background:#090B15;color:#F5F5F5;
   font-family:'Press Start 2P',monospace;
-  font-size:9px;line-height:1.7;
-  padding:8px;overflow-x:hidden;
+  font-size:9px;line-height:1.6;
+  padding:8px 8px 72px 8px;overflow-x:hidden;
 }
-::-webkit-scrollbar{width:8px;background:#000}
-::-webkit-scrollbar-thumb{background:#ff00aa}
+::-webkit-scrollbar{width:6px;background:#090B15}
+::-webkit-scrollbar-thumb{background:#304FFE;border:1px solid #111827}
 
-/* 📺 CRT MONITOR LAYER EFFECT */
+/* 📺 CRT MONITOR COMPACT LAYER EFFECT */
 .crt{
   position:fixed;top:0;left:0;width:100%;height:100%;
-  background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,255,255,.03)50%);
-  background-size:100% 3px;
+  background:linear-gradient(rgba(0,0,0,0)50%,rgba(255,255,255,.015)50%);
+  background-size:100% 4px;
   pointer-events:none;z-index:9999;
 }
 .crt.disabled { display: none; }
 
-/* 👾 PIXEL STEWARD UTILITY MASTER HEADER */
+/* 👾 MASTER HEADER LINK TO PIXEL STEWARD */
 .master-header {
   display: flex; justify-content: space-between; align-items: center;
-  background: #090514; border: 3px outset #ff00aa; padding: 8px; margin-bottom: 12px;
-  box-shadow: 0 0 10px rgba(255, 0, 170, 0.2);
+  background: #111827; border: 3px solid #304FFE; padding: 8px; margin-bottom: 12px;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
 }
-.master-title { color: #ff00aa; text-shadow: 0 0 5px #ff00aa; font-size: 8px; }
+.master-title { color: #33D6FF; font-size: 8px; }
 .pixel-steward-link {
-  text-decoration: none; color: #00ffff; border: 2px outset #00ffff;
-  padding: 4px 8px; font-size: 7px; background: #004444;
-  box-shadow: 0 0 5px #00ffff; font-family: inherit; transition: all 0.05s;
+  text-decoration: none; color: #52FF6B; border: 2px solid #52FF6B;
+  padding: 4px 6px; font-size: 7px; background: #090B15;
+  font-family: inherit; font-weight: bold;
 }
-.pixel-steward-link:active { border-style: inset; background: #002222; }
+.pixel-steward-link:active { transform: translateY(1px); background: #111827; }
 
-/* Mechanical Glowing Cards */
+/* 🎮 COMPACT RPG HEADER HUB */
+.rpg-hub-header {
+  background: #111827;
+  border: 3px solid #304FFE;
+  padding: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
+}
+.rpg-avatar-box {
+  width: 32px; height: 32px;
+  background: #090B15;
+  border: 2px solid #304FFE;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.rpg-hub-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rpg-hub-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rpg-hub-label { color: #FFD54F; font-size: 6px; }
+.rpg-hub-value { color: #F5F5F5; font-size: 7px; }
+.rpg-setting-trigger {
+  background: #090B15; border: 2px solid #304FFE;
+  color: #33D6FF; padding: 6px; cursor: pointer;
+  font-family: inherit; font-size: 10px; display: flex; align-items: center; justify-content: center;
+}
+.rpg-setting-trigger:active { transform: translateY(1px); background: #111827; }
+
+/* Authentic Pixel RPG Windows */
 .card{
-  border:3px outset #ff00aa;background:#090514;
-  padding:12px;margin-bottom:14px;
-  box-shadow: 0 0 15px rgba(255, 0, 170, 0.3);
+  border: 3px solid #304FFE; background: #111827;
+  padding: 12px; margin-bottom: 12px;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
 }
 .card-title{
-  background:linear-gradient(90deg,#440088,#ff00aa);
-  color:#fff;padding:6px 12px;
-  margin:-12px -12px 12px;
-  font-size:9px;letter-spacing:1px;
-  text-shadow:2px 2px 0 #000;
-  display:flex;justify-content:space-between;align-items:center;
-  border-bottom: 3px outset #ff00aa;
+  background: #304FFE;
+  color: #F5F5F5; padding: 6px 8px;
+  margin: -12px -12px 12px;
+  font-size: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 3px solid #304FFE;
 }
 
-/* Alert Flashing Banner */
+/* Alert Red Warning Window */
 .alert-banner{
-  border:3px outset #ff0033;background:#26000c;
-  padding:12px;margin-bottom:14px;
-  text-align:center;
-  box-shadow: 0 0 15px #ff0033;
+  border: 3px solid #FF4E63; background: #240F14;
+  padding: 10px; margin-bottom: 12px;
+  text-align: center;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
 }
 .alert-title{
-  color:#ff0033;font-size:10px;
-  animation:blink .7s infinite;
-  margin-bottom:6px;
-  text-shadow: 0 0 5px #ff0033;
+  color: #FF4E63; font-size: 9px;
+  animation: blink .8s infinite;
+  margin-bottom: 4px;
 }
-.alert-sub{color:#ffaa00;font-size:8px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.alert-sub{ color: #FF9800; font-size: 7px; line-height: 1.4; }
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
 
-/* 🕹️ TACTILE NEON INTERACTIVE COMPONENTS */
-.tabs{display:flex;gap:4px;margin-bottom:12px}
+/* 🕹️ CLASSIC RPG MENU TABS */
+.tabs{display:flex;gap:6px;margin-bottom:12px}
 .tab{
   flex:1;padding:8px 4px;text-align:center;
-  border:3px outset #ff00aa;background:#20003c;
+  border:2px solid #304FFE;background:#090B15;
   cursor:pointer;font-size:8px;font-family:inherit;
-  color:#ffbbee; transition: all 0.05s;
+  color:#33D6FF;
 }
 .tab.active{
-  background:#ff00aa;color:#000;
-  border-style:inset; font-weight: bold;
+  background:#304FFE;color:#F5F5F5;
+  font-weight:bold;
 }
-label{display:block;color:#00ffff;font-size:8px;margin-bottom:4px;text-shadow: 0 0 2px rgba(0,255,255,0.4);}
+label{display:block;color:#FFD54F;font-size:7px;margin-bottom:4px;text-transform:uppercase;}
 input,select{
   width:100%;padding:8px;margin-bottom:10px;
-  background:#000;color:#00ff00;
-  border:2px inset #ff00aa;
+  background:#090B15;color:#52FF6B;
+  border:2px solid #304FFE;
   font-family:'Press Start 2P',monospace;font-size:8px;
-  outline:none;
+  outline:none;border-radius:0;
 }
-input:focus,select:focus{color:#fff;border-color:#00ffff;box-shadow: 0 0 5px #00ffff;}
+input:focus,select:focus{color:#F5F5F5;border-color:#33D6FF;}
 
 .btn{
   width:100%;padding:10px;margin-top:4px;
-  border:3px outset #00ffff;background:#004444;
-  color:#fff;font-family:inherit;font-size:9px;
-  cursor:pointer;text-align:center; transition: transform 0.05s;
+  border:2px solid #33D6FF;background:#090B15;
+  color:#33D6FF;font-family:inherit;font-size:8px;
+  cursor:pointer;text-align:center;
 }
-.btn:active{border-style:inset;background:#002222;transform:translateY(1px);}
-.btn-green{border-color:#00ff00;background:#004400;color:#00ff00}
-.btn-green:active{background:#002200}
-.btn-red{border-color:#ff0033;background:#44000c;color:#ff4466}
-.btn-red:active{background:#220004}
+.btn:active{transform:translateY(1px);background:#111827;}
+.btn-green{border-color:#52FF6B;background:#090B15;color:#52FF6B}
+.btn-green:active{background:#111827}
+.btn-red{border-color:#FF4E63;background:#090B15;color:#FF4E63}
+.btn-red:active{background:#111827}
 
 .status-row, .psych-row{display:flex;gap:6px;margin-bottom:10px}
 .status-btn, .psych-btn{
   flex:1;padding:8px 0;text-align:center;
-  border:2px outset #555;background:#111;
-  font-family:inherit;font-size:8px;cursor:pointer;color:#aaa;
+  border:2px solid #304FFE;background:#090B15;
+  font-family:inherit;font-size:7px;cursor:pointer;color:#F5F5F5;
 }
-.status-btn.tp{border-color:#00ff00;color:#00ff00}
-.status-btn.sl{border-color:#ff0033;color:#ff4466}
-.status-btn.be{border-color:#ffff00;color:#ffff00}
-.status-btn.active-tp{background:#003300;border-color:#00ff00;border-style:inset;color:#00ff00;font-weight:bold;}
-.status-btn.active-sl{background:#33000c;border-color:#ff0033;border-style:inset;color:#ff4466;font-weight:bold;}
-.status-btn.active-be{background:#333300;border-color:#ffff00;border-style:inset;color:#ffff00;font-weight:bold;}
+.status-btn.tp{border-color:#52FF6B;color:#52FF6B}
+.status-btn.sl{border-color:#FF4E63;color:#FF4E63}
+.status-btn.be{border-color:#FFD54F;color:#FFD54F}
+.status-btn.active-tp{background:#52FF6B;border-color:#52FF6B;color:#090B15;font-weight:bold;}
+.status-btn.active-sl{background:#FF4E63;border-color:#FF4E63;color:#F5F5F5;font-weight:bold;}
+.status-btn.active-be{background:#FFD54F;border-color:#FFD54F;color:#090B15;font-weight:bold;}
 
-.psych-btn{font-size:7px;color:#888;}
-.psych-btn.checked{background:#003366;border-color:#00ffff;border-style:inset;color:#00ffff}
+.psych-btn{font-size:7px;color:#33D6FF;border-color:#304FFE;}
+.psych-btn.checked{background:#33D6FF;border-color:#33D6FF;color:#090B15;font-weight:bold;}
 
-/* ⚡ NEON GLOW QUANT RADARS */
-.glow-green { color:#00ff00; text-shadow: 0 0 6px #00ff00; }
-.glow-red { color:#ff0033; text-shadow: 0 0 6px #ff0033; }
-.glow-cyan { color:#00ffff; text-shadow: 0 0 6px #00ffff; }
-.glow-yellow { color:#ffff00; text-shadow: 0 0 6px #ffff00; }
+/* ⚡ PIXEL QUANT STATUS COLOR PALETTE */
+.glow-green { color:#52FF6B; }
+.glow-red { color:#FF4E63; }
+.glow-cyan { color:#33D6FF; }
+.glow-yellow { color:#FFD54F; }
+.txt-white { color:#F5F5F5; }
 
 .trade-item{
-  border:3px outset #ff00aa;background:#0a0518;
+  border:2px solid #304FFE;background:#090B15;
   padding:8px;margin-bottom:8px;
 }
 .trade-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.trade-symbol{color:#00ffff;font-size:9px}
+.trade-symbol{color:#33D6FF;font-size:8px}
 .trade-row{display:flex;justify-content:space-between;margin-bottom:3px;font-size:7px}
-.trade-label{color:#666}
-.trade-value{color:#ccc}
-.badge{padding:2px 6px;font-size:7px;display:inline-block;border:2px outset;}
-.badge-tp{border-color:#00ff00;color:#00ff00;background:#003300}
-.badge-sl{border-color:#ff0033;color:#ff4466;background:#33000c}
-.badge-be{border-color:#ffff00;color:#ffff00;background:#333300}
+.trade-label{color:#FFD54F}
+.trade-value{color:#F5F5F5}
+.badge{padding:2px 4px;font-size:6px;display:inline-block;border:1px solid;}
+.badge-tp{border-color:#52FF6B;color:#52FF6B;background:rgba(82,255,107,0.1)}
+.badge-sl{border-color:#FF4E63;color:#FF4E63;background:rgba(255,78,99,0.1)}
+.badge-be{border-color:#FFD54F;color:#FFD54F;background:rgba(255,213,79,0.1)}
 
-.divider{border-top:2px inset #440088;margin:10px 0}
+.divider{border-top:2px dashed #304FFE;margin:12px 0}
 
-/* 🔋 FIGHTING GAME HP LIFEVAR BAR */
+/* 🔋 PIXEL LIFE BAR (WIN RATE HP STATUS) */
 .hp-bar-wrap {
-  border: 2px solid #555; background: #22000c;
-  height: 12px; position: relative; margin-top: 4px;
-  box-shadow: 0 0 6px #ff0033;
+  border: 2px solid #304FFE; background: #090B15;
+  height: 10px; position: relative; margin-top: 4px;
 }
 .hp-bar-fill {
-  background: linear-gradient(90deg, #ff0055, #00ff66);
-  height: 100%; transition: width 0.3s;
-  box-shadow: 0 0 8px #00ff66;
+  background: #52FF6B;
+  height: 100%; transition: width 0.15s;
 }
 
-/* 🏢 4 THEMATIC STRATEGIC BLOCKS FOR METRICS CLEANUP */
+/* 🏢 4 STRATEGIC SNES WINDOW BLOCKS */
 .stats-block {
-  border: 3px inset #ff00aa; background: rgba(14, 6, 33, 0.9);
-  padding: 12px; margin-bottom: 14px;
-  box-shadow: 0 0 10px rgba(255, 0, 170, 0.15);
+  border: 2px solid #304FFE; background: #090B15;
+  padding: 10px; margin-bottom: 12px;
 }
 .stats-block-title {
-  font-size: 8px; color: #00ffff; margin-bottom: 10px;
-  border-bottom: 2px dashed #440088; padding-bottom: 4px;
-  text-shadow: 0 0 3px #00ffff;
+  font-size: 7px; color: #FFD54F; margin-bottom: 8px;
+  border-bottom: 2px solid #304FFE; padding-bottom: 4px;
 }
-.inner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.stat-subbox { border: 1px solid #331155; background: #04020a; padding: 6px; text-align: center; }
-.stat-sublabel { color: #555; font-size: 6px; margin-bottom: 3px; }
-.stat-subvalue { font-size: 8px; }
+.inner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-subbox { border: 1px solid #304FFE; background: #111827; padding: 6px; text-align: center; }
+.stat-sublabel { color: #33D6FF; font-size: 6px; margin-bottom: 4px; }
+.stat-subvalue { font-size: 10px; font-weight: bold; }
 
-/* 📊 BLOCK 3: WEEKDAY GRID STYLING */
-.weekday-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 6px; text-align: center; }
-.weekday-node { border: 1px solid #ff00aa; background: #080314; padding: 4px 1px; min-height: 48px; display: flex; flex-direction: column; justify-content: space-between; }
-.weekday-lbl { font-size: 5px; color: #00ffff; }
+/* 📊 BLOCK 3: WEEKDAY GRID MATRIX */
+.weekday-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 4px; text-align: center; }
+.weekday-node { border: 1px solid #304FFE; background: #111827; padding: 4px 1px; min-height: 42px; display: flex; flex-direction: column; justify-content: space-between; }
+.weekday-lbl { font-size: 5px; color: #FFD54F; }
 .weekday-val { font-size: 5px; font-weight: bold; }
 
 /* 📅 TRADING CALENDAR SYSTEM UI */
 .cal-box {
-  border: 2px inset #ff00aa; background: rgba(4, 2, 10, 0.95); padding: 8px; margin-top: 10px;
+  border: 1px solid #304FFE; background: #111827; padding: 6px; margin-top: 8px;
 }
-.cal-header-layout { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.cal-grid-mesh { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-.cal-weekday { color: #00ffff; font-size: 6px; padding-bottom: 4px; border-bottom: 1px solid #440088; }
+.cal-header-layout { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cal-grid-mesh { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+.cal-weekday { color: #33D6FF; font-size: 5px; padding-bottom: 3px; border-bottom: 1px solid #304FFE; }
 .cal-day-node {
-  min-height: 42px; padding: 3px 2px; display: flex; flex-direction: column;
-  justify-content: space-between; font-size: 6px; border: 1px solid #221133;
+  min-height: 38px; padding: 2px; display: flex; flex-direction: column;
+  justify-content: space-between; font-size: 5px; border: 1px solid #090B15;
 }
-.cal-day-idx { text-align: left; color: #777; font-size: 6px; }
+.cal-day-idx { text-align: left; color: #FFD54F; font-size: 5px; }
 .cal-day-pnl { font-weight: bold; font-size: 5px; }
-.cal-day-count { color: #666; font-size: 5px; text-align: right; }
+.cal-day-count { color: #33D6FF; font-size: 4px; text-align: right; }
 
-/* Today's Special Mark Skin */
-.skin-cal-today { border: 2px solid #00ffff !important; box-shadow: 0 0 8px #00ffff; position: relative; }
-.skin-cal-today .cal-day-idx { color: #00ffff !important; font-weight: bold; }
+/* Calendar Special State Highlight Marks */
+.skin-cal-today { border: 1px dashed #33D6FF !important; background: #1a233d !important; }
+.skin-cal-today .cal-day-idx { color: #33D6FF !important; font-weight: bold; }
 
-.skin-cal-win { background: #002b11 !important; border: 1px solid #00ff66 !important; color: #00ff66 !important; }
-.skin-cal-win .cal-day-idx, .skin-cal-win .cal-day-count { color: #00ff66 !important; }
-.skin-cal-loss { background: #26000c !important; border: 1px solid #ff0033 !important; color: #ff4466 !important; }
-.skin-cal-loss .cal-day-idx, .skin-cal-loss .cal-day-count { color: #ff4466 !important; }
-.skin-cal-blank { background: #090514; color: #333; opacity: 0.15; }
-.skin-cal-neutral { background: #0f0b21; border: 1px solid #332255; }
+.skin-cal-win { background: rgba(82,255,107,0.1) !important; border: 1px solid #52FF6B !important; color: #52FF6B !important; }
+.skin-cal-win .cal-day-idx, .skin-cal-win .cal-day-count { color: #52FF6B !important; }
+.skin-cal-loss { background: rgba(255,78,99,0.1) !important; border: 1px solid #FF4E63 !important; color: #FF4E63 !important; }
+.skin-cal-loss .cal-day-idx, .skin-cal-loss .cal-day-count { color: #FF4E63 !important; }
+.skin-cal-blank { background: #090B15; color: #111827; opacity: 0.2; }
+.skin-cal-neutral { background: #090B15; border: 1px solid #304FFE; }
 
-.psych-cost-box { background: rgba(38, 0, 12, 0.85); border: 2px inset #ff0033; padding: 10px; box-shadow: inset 0 0 10px rgba(255,0,51,0.2); }
-.psych-cost-row { display: flex; justify-content: space-between; font-size: 7px; margin-bottom: 4px; color: #ff4466; }
+/* Block 4: Psychology Warning Panel */
+.psych-cost-box { background: #240F14; border: 2px solid #FF4E63; padding: 8px; }
+.psych-cost-row { display: flex; justify-content: space-between; font-size: 7px; margin-bottom: 4px; color: #FF4E63; }
 
-.cf-item{ border:2px outset #00ff00;background:#020a02; padding:8px;margin-bottom:6px; display:flex;justify-content:space-between;align-items:center; }
-.cf-deposit{color:#00ff00;text-shadow: 0 0 3px #00ff00;}
-.cf-withdraw{color:#ff0033;text-shadow: 0 0 3px #ff0033;}
-.setting-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a0c30;}
+.cf-item{ border:2px solid #304FFE; background:#090B15; padding:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+.cf-deposit{color:#52FF6B;}
+.cf-withdraw{color:#FF4E63;}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #304FFE;}
 
-.toggle{width:40px;height:20px;border:2px outset #00ffff;background:#002222;cursor:pointer;position:relative;display:flex;align-items:center;}
-.toggle-knob{width:14px;height:14px;background:#444;position:absolute;transition:left .1s;}
-.toggle-knob.on{left:22px;background:#00ff00;box-shadow: 0 0 5px #00ff00;}
-.toggle-knob.off{left:2px;background:#555}
-.empty{color:#444;text-align:center;padding:20px;font-size:8px}
+.toggle{width:36px;height:18px;border:2px solid #304FFE;background:#090B15;cursor:pointer;position:relative;display:flex;align-items:center;}
+.toggle-knob{width:12px;height:12px;background:#FF4E63;position:absolute;transition:left .1s;}
+.toggle-knob.on{left:18px;background:#52FF6B;}
+.toggle-knob.off{left:2px;background:#FF4E63;}
+.empty{color:#304FFE;text-align:center;padding:16px;font-size:7px}
 
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#04020a;border-top:3px outset #ff00aa;display:flex;z-index:100;}
-.nav-btn{flex:1;padding:12px 4px 8px;text-align:center;border:none;background:transparent;font-family:inherit;font-size:7px;color:#556;cursor:pointer;}
-.nav-btn.active{color:#00ffff;border-top:3px inset #00ffff;background:#0e0520;text-shadow: 0 0 4px #00ffff;}
-.nav-icon{font-size:14px;display:block;margin-bottom:3px}
-.page-wrap{padding-bottom:64px}
-.del-btn{background:#220004;border:1px outset #ff0033;color:#ff4466;padding:3px 6px;font-family:inherit;font-size:7px;cursor:pointer;}
-.del-btn:active{border-style:inset}
-.filter-bar{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+/* 🕹️ AUTHENTIC RPG BOTTOM NAVIGATION BAR */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111827;border-top:3px solid #304FFE;display:flex;z-index:100;height:48px;}
+.nav-btn{flex:1;padding:6px 2px;text-align:center;border:none;background:transparent;font-family:inherit;font-size:7px;color:#F5F5F5;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.nav-btn.active{color:#33D6FF;background:#090B15;border-top:2px solid #33D6FF;}
+.nav-btn:active { transform: translateY(1px); }
+.nav-icon{font-size:11px;display:block;margin-bottom:2px}
+.page-wrap{padding-bottom:12px}
+.del-btn{background:#090B15;border:1px solid #FF4E63;color:#FF4E63;padding:3px 6px;font-family:inherit;font-size:6px;cursor:pointer;}
+.del-btn:active{background:#240F14;}
+.filter-bar{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
 .filter-row{display:flex;gap:4px}
 .filter-row select,.filter-row input{margin-bottom:0;font-size:7px}
 .pie-wrap{display:flex;align-items:center;gap:12px;margin:8px 0}
-.pie-legend{display:flex;flex-direction:column;gap:6px}
-.pie-legend-item{display:flex;align-items:center;gap:6px;font-size:7px}
-.pie-dot{width:10px;height:10px;border:1px solid #333;flex-shrink:0}
+.pie-legend{display:flex;flex-direction:column;gap:4px}
+.pie-legend-item{display:flex;align-items:center;gap:6px;font-size:6px}
+.pie-dot{width:8px;height:8px;border:1px solid #090B15;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -452,6 +488,7 @@ function render() { syncCrtView(); document.getElementById('app').innerHTML=buil
 
 function buildApp() {
   return `
+    ${buildHubHeader()}
     ${buildAlert()}
     <div class="page-wrap">
       ${state.page==='HOME'     ? buildHome()     : ''}
@@ -460,6 +497,41 @@ function buildApp() {
       ${state.page==='SETTINGS' ? buildSettings() : ''}
     </div>
     ${buildNav()}
+  `;
+}
+
+// 🕹️ REPLACEMENT OF FAKE GAME CURRENCIES WITH USEFUL TRADING MASTER INFO
+function buildHubHeader() {
+  const allTrades = state.trades;
+  const p = state.statsPeriod;
+  let filtered = filterByPeriod(allTrades, p);
+  if (p.account && p.account !== 'ALL') filtered = filtered.filter(t => (t.account || 'Demo') === p.account);
+  
+  const netDeposit = state.cfs.filter(c => p.account === 'ALL' || (c.account || 'Demo') === p.account).reduce((s, cf) => s + (cf.type === 'Deposit' ? cf.amount : -cf.amount), 0);
+  const equity = state.balance + netDeposit + filtered.reduce((s, t) => s + t.pnl, 0);
+  
+  const todayTrades = allTrades.filter(tr => tr.date === today());
+  const todayPnl = todayTrades.reduce((s, tr) => s + tr.pnl, 0);
+  
+  return `
+    <div class="rpg-hub-header">
+      <div class="rpg-avatar-box">🧙‍♂️</div>
+      <div class="rpg-hub-info">
+        <div class="rpg-hub-row">
+          <span class="rpg-hub-label">ACC:</span>
+          <span class="rpg-hub-value" style="color:#33D6FF;">${p.account}</span>
+        </div>
+        <div class="rpg-hub-row">
+          <span class="rpg-hub-label">NET EQUITY:</span>
+          <span class="rpg-hub-value" style="color:#52FF6B;">$${fmt(equity,1)}</span>
+        </div>
+        <div class="rpg-hub-row">
+          <span class="rpg-hub-label">TODAY P/L:</span>
+          <span class="rpg-hub-value ${todayPnl >= 0 ? 'glow-green' : 'glow-red'}">${todayPnl >= 0 ? '+' : ''}$${fmt(todayPnl,1)}</span>
+        </div>
+      </div>
+      <button class="rpg-setting-trigger" id="hub-setting-btn">⚙️</button>
+    </div>
   `;
 }
 
@@ -629,8 +701,8 @@ function buildCFLog() {
   return sorted.map(cf=>`
     <div class="cf-item">
       <div>
-        <div style="color:#777;font-size:7px;margin-bottom:3px">${fmtDate(cf.date)} [${cf.account||'Demo'}]</div>
-        <div style="font-size:8px;color:#aaa">${cf.desc||cf.type}</div>
+        <div style="color:#FFD54F;font-size:7px;margin-bottom:3px">${fmtDate(cf.date)} [${cf.account||'Demo'}]</div>
+        <div style="font-size:8px;color:#F5F5F5">${cf.desc||cf.type}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="${cf.type==='Deposit'?'cf-deposit':'cf-withdraw'}" style="font-size:9px">${cf.type==='Deposit'?'+':'-'}$${fmt(cf.amount,0)}</span>
@@ -664,8 +736,8 @@ function buildCalendarSection(allTrades, accountFilter) {
     let skinClass = "skin-cal-neutral";
     let pnlDisplay = "$0.00";
     if (tradeCount > 0) {
-      if (totalPnl > 0) { skinClass = "skin-cal-win"; pnlDisplay = `+$${totalPnl.toFixed(2)}`; }
-      else if (totalPnl < 0) { skinClass = "skin-cal-loss"; pnlDisplay = `-$${Math.abs(totalPnl).toFixed(2)}`; }
+      if (totalPnl > 0) { skinClass = "skin-cal-win"; pnlDisplay = `+$${totalPnl.toFixed(0)}`; }
+      else if (totalPnl < 0) { skinClass = "skin-cal-loss"; pnlDisplay = `-$${Math.abs(totalPnl).toFixed(0)}`; }
     }
     
     const isToday = currentStr === tStr;
@@ -673,9 +745,9 @@ function buildCalendarSection(allTrades, accountFilter) {
 
     htmlMesh += `
       <div class="cal-day-node ${skinClass}">
-        <div class="cal-day-idx">${isToday ? '★ ' + day : day}</div>
-        <div class="cal-day-pnl">${tradeCount > 0 ? pnlDisplay : '$0.00'}</div>
-        <div class="cal-day-count">${tradeCount} T</div>
+        <div class="cal-day-idx">${isToday ? '★' + day : day}</div>
+        <div class="cal-day-pnl">${tradeCount > 0 ? pnlDisplay : '$0'}</div>
+        <div class="cal-day-count">${tradeCount}T</div>
       </div>`;
   }
 
@@ -686,9 +758,9 @@ function buildCalendarSection(allTrades, accountFilter) {
   return `
     <div class="cal-box">
       <div class="cal-header-layout">
-        <button class="btn" id="cal-prev" style="width:45px; margin:0; padding:6px 0;"><</button>
-        <span class="glow-cyan" style="font-size:8px;">${monthNames[month]} ${year}</span>
-        <button class="btn" id="cal-next" style="width:45px; margin:0; padding:6px 0;">></button>
+        <button class="btn" id="cal-prev" style="width:35px; margin:0; padding:4px 0;"><</button>
+        <span class="glow-cyan" style="font-size:7px;">${monthNames[month]} ${year}</span>
+        <button class="btn" id="cal-next" style="width:35px; margin:0; padding:4px 0;">></button>
       </div>
       <div class="cal-grid-mesh">${htmlMesh}</div>
     </div>`;
@@ -750,7 +822,7 @@ function buildStats() {
     <div class="card">
       <div class="card-title"><span>📊 COMMAND STATS MODULE</span></div>
       
-      <div style="color:#666;font-size:7px;margin-bottom:6px">GLOBAL STATE FILTERS</div>
+      <div style="color:#FFD54F;font-size:7px;margin-bottom:6px">GLOBAL STATE FILTERS</div>
       ${buildPeriodFilter('stats',p)}
       <div class="filter-row" style="margin-bottom:12px">
         <select id="stats-account" style="width:100%;font-size:7px">
@@ -780,15 +852,15 @@ function buildStats() {
         <div class="stats-block-title">📦 BLOCK 2: QUANT PERFORMANCE RADAR</div>
         <div class="inner-grid">
           <div class="stat-subbox"><div class="stat-sublabel">PROFIT FACTOR</div><div class="stat-subvalue ${pfClass}">${st.profitFactor}</div></div>
-          <div class="stat-subbox"><div class="stat-sublabel">EXPECTANCY / PER TRADE</div><div class="stat-subvalue ${expClass}">${parseFloat(st.expectancy)>=0?'+':''}$${st.expectancy}</div></div>
-          <div class="stat-subbox"><div class="stat-sublabel">MAX WIN STREAKS 🔥</div><div class="stat-subvalue glow-green">${st.maxWinStreak} ไม้ติด</div></div>
-          <div class="stat-subbox"><div class="stat-sublabel">MAX LOSS STREAKS 💀</div><div class="stat-subvalue glow-red">${st.maxLossStreak} ไม้ติด</div></div>
-          <div class="stat-subbox"><div class="stat-sublabel">AVG WIN R:R RATIO</div><div class="stat-subvalue txt-white">${st.avgRR}</div></div>
-          <div class="stat-subbox"><div class="stat-sublabel">TOTAL TRADES COUNT</div><div class="stat-subvalue glow-cyan">${st.total}</div></div>
+          <div class="stat-subbox"><div class="stat-sublabel">EXPECTANCY / TRADE</div><div class="stat-subvalue ${expClass}">${parseFloat(st.expectancy)>=0?'+':''}$${st.expectancy}</div></div>
+          <div class="stat-subbox"><div class="stat-sublabel">MAX WIN STREAK</div><div class="stat-subvalue glow-green">${st.maxWinStreak}</div></div>
+          <div class="stat-subbox"><div class="stat-sublabel">MAX LOSS STREAK</div><div class="stat-subvalue glow-red">${st.maxLossStreak}</div></div>
+          <div class="stat-subbox"><div class="stat-sublabel">AVG WIN R:R</div><div class="stat-subvalue txt-white">${st.avgRR}</div></div>
+          <div class="stat-subbox"><div class="stat-sublabel">TOTAL TRADES</div><div class="stat-subvalue glow-cyan">${st.total}</div></div>
           
           <div class="stat-subbox" style="grid-column: span 2">
             <div class="stat-sublabel">CORE ACTION MATRIX RATIO</div>
-            <div style="display:flex; justify-content:space-around; margin-top:4px;">
+            <div style="display:flex; justify-content:space-around; margin-top:4px; font-size:7px;">
               <span>W: <span class="glow-green">${st.wins}</span></span>
               <span>BE: <span class="glow-yellow">${st.bes}</span></span>
               <span>L: <span class="glow-red">${st.loses}</span></span>
@@ -805,9 +877,9 @@ function buildStats() {
         <div class="stats-block-title">📦 BLOCK 4: ANALYTICS CHANNELS &amp; DIARY</div>
         
         <div class="psych-cost-box" style="margin-bottom:10px;">
-          <div style="color:#ff0033; font-size:7px; margin-bottom:6px; text-shadow: 0 0 3px #ff0033;">⚠️ PSYCHOLOGY LOSS SPECTRUM</div>
-          <div class="psych-cost-row"><span>GREED COST (ความโลภ):</span><span class="glow-red">-$${fmt(st.greedCost,2)}</span></div>
-          <div class="psych-cost-row"><span>FEAR COST (ความกลัว):</span><span class="glow-red">-$${fmt(st.fearCost,2)}</span></div>
+          <div style="color:#FF4E63; font-size:7px; margin-bottom:6px;">⚠️ PSYCHOLOGY LOSS SPECTRUM</div>
+          <div class="psych-cost-row"><span>GREED COST:</span><span class="glow-red">-$${fmt(st.greedCost,2)}</span></div>
+          <div class="psych-cost-row"><span>FEAR COST:</span><span class="glow-red">-$${fmt(st.fearCost,2)}</span></div>
         </div>
 
         ${buildCalendarSection(allTrades, p.account)}
@@ -830,11 +902,11 @@ function buildEquityCurve(trades) {
   const pts=points.map((v,i)=>{ const x=PL+(i/(points.length-1||1))*IW; const y=PT+IH-((v-minV)/range)*IH; return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(' ');
   const zeroY=(PT+IH-((0-minV)/range)*IH).toFixed(1);
   return `
-    <div style="margin-top:12px;color:#666;font-size:7px;margin-bottom:4px">📈 EQUITY GROWTH TRAJECTORY</div>
+    <div style="margin-top:12px;color:#FFD54F;font-size:7px;margin-bottom:4px">📈 EQUITY GROWTH TRAJECTORY</div>
     <div style="overflow-x:auto">
-      <svg width="${W}" height="${H}" style="display:block;background:#03020a;border:2px inset #ff00aa">
-        <line x1="${PL}" y1="${zeroY}" x2="${W-PR}" y2="${zeroY}" stroke="#221133" stroke-width="1" stroke-dasharray="4,3"/>
-        <polyline points="${pts}" fill="none" stroke="#00ffff" stroke-width="2"/>
+      <svg width="${W}" height="${H}" style="display:block;background:#090B15;border:2px solid #304FFE">
+        <line x1="${PL}" y1="${zeroY}" x2="${W-PR}" y2="${zeroY}" stroke="#111827" stroke-width="1" stroke-dasharray="4,3"/>
+        <polyline points="${pts}" fill="none" stroke="#33D6FF" stroke-width="2"/>
       </svg>
     </div>`;
 }
@@ -842,7 +914,7 @@ function buildEquityCurve(trades) {
 function buildPieChart(st) {
   const total=st.wins+st.loses+st.bes; if (total===0) return `<div class="empty" style="margin-top:12px">ไม่มีข้อมูลเรนเดอร์อัตราส่วนสถิติ</div>`;
   const cx=60,cy=60,r=50;
-  const slices=[{label:'Win', val:st.wins, color:'#00ff66'},{label:'BE', val:st.bes, color:'#ffff00'},{label:'Lose',val:st.loses,color:'#ff0055'}].filter(s=>s.val>0);
+  const slices=[{label:'Win', val:st.wins, color:'#52FF6B'},{label:'BE', val:st.bes, color:'#FFD54F'},{label:'Lose',val:st.loses,color:'#FF4E63'}].filter(s=>s.val>0);
   let paths=''; let startAngle=-Math.PI/2;
   slices.forEach(s=>{
     const angle=(s.val/total)*Math.PI*2; const endAngle=startAngle+angle;
@@ -850,20 +922,20 @@ function buildPieChart(st) {
     const x2=cx+r*Math.cos(endAngle); const y2=cy+r*Math.sin(endAngle);
     const large=angle>Math.PI?1:0;
     if (slices.length===1) { paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${s.color}" opacity="0.85"/>`; }
-    else { paths+=`<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${s.color}" opacity="0.85" stroke="#000" stroke-width="1"/>`; }
+    else { paths+=`<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${s.color}" opacity="0.85" stroke="#090B15" stroke-width="1"/>`; }
     startAngle=endAngle;
   });
-  const legend=[{label:'Win', pct:st.wins, color:'#00ff66'},{label:'BE', pct:st.bes, color:'#ffff00'},{label:'Lose',pct:st.loses, color:'#ff0055'}];
+  const legend=[{label:'Win', pct:st.wins, color:'#52FF6B'},{label:'BE', pct:st.bes, color:'#FFD54F'},{label:'Lose',pct:st.loses, color:'#FF4E63'}];
   return `
-    <div style="margin-top:12px;color:#666;font-size:7px;margin-bottom:4px">🥧 ACTION WIN/BE/LOSE RATIO</div>
+    <div style="margin-top:12px;color:#FFD54F;font-size:7px;margin-bottom:4px">🥧 ACTION WIN/BE/LOSE RATIO</div>
     <div class="pie-wrap">
       <svg width="120" height="120" style="flex-shrink:0">${paths}</svg>
       <div class="pie-legend">
         ${legend.map(l=>`
           <div class="pie-legend-item">
             <div class="pie-dot" style="background:${l.color}"></div>
-            <span style="color:#aaa">${l.label}</span>
-            <span style="color:#fff">${l.pct} <span style="color:#555">(${total>0?(l.pct/total*100).toFixed(0):0}%)</span></span>
+            <span style="color:#F5F5F5">${l.label}</span>
+            <span style="color:#33D6FF">${l.pct} <span style="color:#FFD54F">(${total>0?(l.pct/total*100).toFixed(0):0}%)</span></span>
           </div>`).join('')}
       </div>
     </div>`;
@@ -882,16 +954,16 @@ function buildSettings() {
         <div class="toggle" id="toggle-sound"><div class="toggle-knob ${state.sound?'on':'off'}"></div></div>
       </div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <span style="color:#666;font-size:8px">Starting Balance ($)</span>
+        <span style="color:#FFD54F;font-size:8px">Starting Balance ($)</span>
         ${state.editBal?`<div style="display:flex;gap:6px;width:100%"><input type="number" id="bal-input" value="${state.tempBal}" style="margin-bottom:0;flex:1"><button class="btn" id="bal-save-btn">OK</button></div>`:`<div style="display:flex;gap:8px;align-items:center"><span class="glow-cyan" style="font-size:11px">$${fmt(state.balance,0)}</span><button class="btn" id="btn-edit-bal" style="margin-top:0;font-size:7px">EDIT CAP</button></div>`}
       </div>
       <div class="divider"></div>
-      <div style="color:#666;font-size:7px;margin-bottom:8px">💾 DATA DISK MANAGEMENT</div>
+      <div style="color:#FFD54F;font-size:7px;margin-bottom:8px">💾 DATA DISK MANAGEMENT</div>
       <button class="btn btn-green" id="btn-backup" style="margin-bottom:8px">▼ BACKUP CORE DATA</button>
       <button class="btn" id="btn-import-trigger" style="margin-bottom:8px">▲ IMPORT DATA DISK</button>
       <input type="file" id="btn-import" accept=".json" style="display:none">
       <div class="divider"></div>
-      <div style="color:#ff0033;font-size:7px;margin-bottom:8px">⚠ DANGER ZONE DEPOT</div>
+      <div style="color:#FF4E63;font-size:7px;margin-bottom:8px">⚠ DANGER ZONE DEPOT</div>
       <button class="btn btn-red" id="btn-clear-trades">✕ ล้างประวัติการเทรดทั้งหมด</button>
     </div>`;
 }
@@ -900,6 +972,9 @@ function attachEvents() {
   document.querySelectorAll('[data-nav]').forEach(el=>{ el.addEventListener('click',()=>{ state.page=el.dataset.nav; beep('click'); render(); }); });
   document.querySelectorAll('[data-tab-input]').forEach(el=>{ el.addEventListener('click',()=>{ state.inputTab=el.dataset.tabInput; render(); }); });
   document.querySelectorAll('[data-tab-log]').forEach(el=>{ el.addEventListener('click',()=>{ state.logTab=el.dataset.tabLog; render(); }); });
+  
+  const hubSetting = document.getElementById('hub-setting-btn');
+  if(hubSetting) { hubSetting.addEventListener('click', () => { state.page = 'SETTINGS'; beep('click'); render(); }); }
 
   const liveF={'f-date':v=>state.f.date=v,'f-symbol':v=>state.f.symbol=v,'f-tf':v=>state.f.tf=v,'f-entry':v=>state.f.entry=v,'f-exit':v=>state.f.exit=v,'f-sl':v=>state.f.sl=v,'f-lot':v=>state.f.lot=v,'f-pnl':v=>state.f.pnl=v,'f-account':v=>state.f.account=v};
   Object.entries(liveF).forEach(([id,fn])=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',e=>fn(e.target.value)); });
@@ -1007,4 +1082,4 @@ function bindPeriodFilter(prefix, period, onChange) {
 initCloudDatabase();
 </script>
 </body>
-</html> 
+</html>
